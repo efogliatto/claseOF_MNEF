@@ -1,0 +1,137 @@
+\begin{frame}
+    \frametitle{Discretizaci\'on de Navier-Stokes}
+%    \framesubtitle{Discretizaci\'on del t\'ermino temporal}
+    
+
+    \begin{columns}
+        
+        \column{0.45\textwidth}
+        \begin{block}{\centering Flujo incompresible}
+            $$ \nabla \cdot \bs{U} = 0 $$
+            $$ \frac{\partial \bs{U}}{\partial t} + \nabla \cdot (\bs{U}\bs{U}) - \nabla \cdot (\nu \nabla \bs{U}) = -\nabla p$$
+        \end{block}
+        
+        
+        \column{0.45\textwidth}   
+        \begin{align*}
+            \nabla \cdot (\bs{U}\bs{U}) &= \sum_f \bs{S} \cdot (\bs{U})_f (\bs{U})_f \\
+                                                &= \sum_f F (\bs{U})_f \\
+                                                &= a_P\bs{U}_P + \sum_N a_N\bs{U}_N 
+        \end{align*}     
+        
+    \end{columns}
+
+    \vspace{0.5cm}
+    Los coeficientes $a_N$ y $a_P$ dependen de {\bf U}.
+    Dos aspectos requieren especial atenci\'on:
+    \begin{enumerate}
+        \item No linealidad en la ecuaci\'on de momento
+        \item Acoplamiento de velocidad y presi\'on
+        \begin{itemize}
+            \item PISO para problemas dependientes del tiempo
+            \item SIMPLE para casos estacionarios
+        \end{itemize}
+    \end{enumerate}
+
+\end{frame} 
+
+
+
+
+\begin{frame}
+    \frametitle{Discretizaci\'on de Navier-Stokes}
+    \framesubtitle{Derivaci\'on de una ecuaci\'on para la presi\'on}
+    
+    Uso de una forma semi-discretizada de la ecuaci\'on de momento, siguiendo el \textquotedblleft esp\'iritu" de Rhie y Chow
+    $$
+        a_P \bs{U_P} = \bs{H} (\bs{U}) - \nabla p
+    $$
+    
+    El t\'ermino $\bs{H} (\bs{U})$ tiene dos partes:
+    \begin{enumerate}
+        \item Transporte
+        \item Fuente. T\'erminos de la discretizaci\'on temporal y otras fuentes (adem\'as de $\nabla p$)
+    \end{enumerate}    
+    $$
+        \bs{H} (\bs{U}) = -\sum_N a_N \bs{U_N} + \frac{\bs{U}^0}{\Delta t}
+    $$    
+
+\end{frame} 
+
+
+\begin{frame}
+    \frametitle{Discretizaci\'on de Navier-Stokes}
+    \framesubtitle{Derivaci\'on de una ecuaci\'on para la presi\'on}
+    
+    Discretizando la ecuaci\'on de continuidad
+    $$  \nabla \cdot \bs{U} = \sum_f \bs{S} \bs{U}_f = 0   $$
+    
+    y usando 
+    $$  \bs{U_P} = \frac{\bs{H} (\bs{U})}{a_P} - \frac{\nabla p}{a_P}   $$
+    
+    se obtiene una expresi\'on para el flujo en las caras
+    $$ \bs{U_f} = \left ( \frac{\bs{H}(\bs{U})}{a_P} \right )_f - \left ( \frac{\nabla p}{a_P} \right )_f  $$
+
+    %% $$
+    %%     a_P \mathbf{U_P} = \mathbf{H} (\mathbf{U}) - \sum_f \mathbf{S}(p)_f
+    %% $$    
+    %% $$
+    %%     \sum_f \mathbf{S} \cdot \left[ \left( \frac{1}{a_P}\right)_f  (\nabla p)_f\right] = \sum_f \mathbf{S} \cdot \left( \frac{\mathbf{H(\mathbf{U})}}{a_P} \right)_f
+    %% $$
+
+\end{frame} 
+
+
+
+
+\begin{frame}
+    \frametitle{Discretizaci\'on de Navier-Stokes}
+    \framesubtitle{Derivaci\'on de una ecuaci\'on para la presi\'on}
+    
+    Reemplazando la expresi\'on para velocidad en las caras en la ecuaci\'on de continuidad, puede obtenerse una ecuaci\'on para la presi\'on
+    $$ \nabla \cdot \left( \frac{\nabla p}{a_P} \right) = \nabla \cdot \left( \frac{ \bs{H} (\bs{U})}{a_P} \right) = \sum_f \bs{S} \cdot \left( \frac{ \bs{H} (\bs{U})}{a_P} \right)_f$$
+
+    Discretizando el operador laplaciano en la forma est\'andar, se obtienen las ecuaciones de Navier-Stokes discretas
+    
+    $$  a_P \bs{U_P} = \bs{H} (\bs{U}) - \sum_f \bs{S}(p)_f   $$    
+    $$  \sum_f \bs{S} \cdot \left[ \left( \frac{1}{a_P}\right)_f  (\nabla p)_f\right] = \sum_f \bs{S} \cdot \left( \frac{\bs{H(\bs{U})}}{a_P} \right)_f   $$
+
+\end{frame} 
+
+
+
+
+
+\begin{frame}
+    \frametitle{Discretizaci\'on de Navier-Stokes}
+    \framesubtitle{Acoplamiento presi\'on-velocidad}
+    
+    \begin{block}{Algoritmo PISO}
+        \begin{itemize}
+            \item Se resuelve la ecuaci\'on de momento, usando el campo de presi\'on del paso anterior ({\bf momentum predictor}).
+            \item Conocido el campo de velocidades, se construye $\mathbf{H}(\mathbf{U})$ y resuelve la ecuaci\'on de la presi\'on ({\bf pressure solution}).
+            \item Se calculan flujos conservativos consistentes con la nueva presi\'on, y se corrige la velocidad en forma expl\'icita ({\bf explicit velocity correction}).
+            \item Se repiten los pasos \textbf{pressure solution} y \textbf{explicit velocity correction} hasta alcanzar la convergencia.
+        \end{itemize}
+    \end{block}     
+
+\end{frame} 
+
+
+\begin{frame}
+    \frametitle{Discretizaci\'on de Navier-Stokes}
+    \framesubtitle{Acoplamiento presi\'on-velocidad}
+    
+    \begin{block}{Algoritmo SIMPLE}
+        No es necesario resolver en forma completa el acoplamiento, Se hace uso de:
+        \begin{itemize}
+            \item Velocidades obtenidas a trav\'es de la ecuaci\'on de momento, calculando el gradiente de presi\'on a partir de un paso anterior. La ecuaci\'on se relaja usando un factor de sobre-relajaci\'on.
+            \item Se resuelve la ecuaci\'on para la presi\'on.
+            \item Se sobre-relaja la ecuaci\'on para la presi\'on
+            $$
+            p^{new} = p^{old} + \alpha_p(p^{p}-p^{old})
+            $$
+        \end{itemize}
+    \end{block}     
+
+\end{frame} 

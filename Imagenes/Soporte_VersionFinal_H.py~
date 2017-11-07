@@ -1,0 +1,1561 @@
+### This file is generated automatically by SALOME v6.6.0 with dump python functionality
+###
+
+import sys
+import salome
+
+salome.salome_init()
+theStudy = salome.myStudy
+
+import salome_notebook
+notebook = salome_notebook.notebook
+
+notebook.set("blanco_elem", 0.075)
+notebook.set("solid_elem", 1.25)
+notebook.set("fluid2tapa_elem", 0.075)
+notebook.set("fluid2cuerpo_elem", 0.075)
+notebook.set("fluid_maxsize", 1)
+#sys.path.insert( 0, r'/users/fogliate/OpenFOAM/User/Ciclotron/Salome/Final')
+
+###
+### GEOM component
+###
+
+import GEOM
+import geompy
+import math
+import SALOMEDS
+
+geompy.init_geom(theStudy)
+
+
+
+
+#-----------------------------------------------------------------------#
+#                               TAPA                                    #
+#-----------------------------------------------------------------------#
+
+# Se construye inicialmente con la parte superior (donde se deposita el blanco)
+# en el plano Z = 0. Las partes se construyen siguiendo la direccion positiva del
+# eje Z. Al finalizar la construccion geometrica, se rota y desplaza a su posicion
+# final
+
+# Sistema de coordenadas
+O = geompy.MakeVertex(0, 0, 0)
+OX = geompy.MakeVectorDXDYDZ(1, 0, 0)
+OY = geompy.MakeVectorDXDYDZ(0, 1, 0)
+OZ = geompy.MakeVectorDXDYDZ(0, 0, 1)
+Plane_OZX = geompy.MakePlaneLCS(None, 200, 3)
+
+geompy.addToStudy( O, 'O' )
+geompy.addToStudy( OX, 'OX' )
+geompy.addToStudy( OY, 'OY' )
+geompy.addToStudy( OZ, 'OZ' )
+geompy.addToStudy( Plane_OZX, 'Plane_OZX' )
+
+
+# Parte superior (mayor)
+Vertex_1 = geompy.MakeVertex(-31, -19, 0)
+Vertex_2 = geompy.MakeVertex(31, 19, 4)
+Vertex_3 = geompy.MakeVertex(-31, 0, 0)
+Vertex_4 = geompy.MakeVertex(31, 0, 0)
+Box_1 = geompy.MakeBoxTwoPnt(Vertex_1, Vertex_2)
+Cylinder_1 = geompy.MakeCylinder(Vertex_3, OZ, 19, 4)
+Cylinder_2 = geompy.MakeCylinder(Vertex_4, OZ, 19, 4)
+Fuse_1 = geompy.MakeFuse(Box_1, Cylinder_1)
+Tapa_sup = geompy.MakeFuse(Fuse_1, Cylinder_2)
+
+#geompy.addToStudy( Vertex_1, 'Vertex_1' )
+#geompy.addToStudy( Vertex_2, 'Vertex_2' )
+#geompy.addToStudy( Vertex_3, 'Vertex_3' )
+#geompy.addToStudy( Vertex_4, 'Vertex_4' )
+#geompy.addToStudy( Box_1, 'Box_1' )
+#geompy.addToStudy( Cylinder_1, 'Cylinder_1' )
+#geompy.addToStudy( Cylinder_2, 'Cylinder_2' )
+#geompy.addToStudy( Fuse_1, 'Fuse_1' )
+#geompy.addToStudy( Tapa_sup, 'Tapa_sup' )
+
+
+
+# Parte inferior (menor). En esta se encuentran los canales
+Vertex_5 = geompy.MakeVertex(-32, -9, 4)
+Vertex_6 = geompy.MakeVertex(32, 9, 6.6)
+Vertex_7 = geompy.MakeVertex(-32, 0, 4)
+Vertex_8 = geompy.MakeVertex(32, 0, 4)
+Box_2 = geompy.MakeBoxTwoPnt(Vertex_5, Vertex_6)
+Cylinder_3 = geompy.MakeCylinder(Vertex_7, OZ, 9, 2.6)
+Cylinder_4 = geompy.MakeCylinder(Vertex_8, OZ, 9, 2.6)
+Fuse_2 = geompy.MakeFuse(Box_2, Cylinder_3)
+Tapa_inf = geompy.MakeFuse(Fuse_2, Cylinder_4)
+
+#geompy.addToStudy( Vertex_5, 'Vertex_5' )
+#geompy.addToStudy( Vertex_6, 'Vertex_6' )
+#geompy.addToStudy( Vertex_7, 'Vertex_7' )
+#geompy.addToStudy( Vertex_8, 'Vertex_8' )
+#geompy.addToStudy( Box_2, 'Box_2' )
+#geompy.addToStudy( Cylinder_3, 'Cylinder_3' )
+#geompy.addToStudy( Cylinder_4, 'Cylinder_4' )
+#geompy.addToStudy( Fuse_2, 'Fuse_2' )
+#geompy.addToStudy( Tapa_inf, 'Tapa_inf' )
+
+
+
+# Tapa solida, sin la remocion de los canales
+Tapa_SinCanales = geompy.MakeFuse(Tapa_sup, Tapa_inf)
+#geompy.addToStudy( Tapa_SinCanales, 'Tapa_SinCanales' )
+
+
+
+# Canal central
+Vertex_9 = geompy.MakeVertex(-31.25, -1, 1)
+Vertex_10 = geompy.MakeVertex(31.25, 1, 6.6)
+Vertex_11 = geompy.MakeVertex(-31.25, -1, 10)
+Vertex_12 = geompy.MakeVertex(31.25, -1, 10)
+Box_3 = geompy.MakeBoxTwoPnt(Vertex_9, Vertex_10)
+Cylinder_5 = geompy.MakeCylinder(Vertex_11, OY, 9, 2)
+Cylinder_6 = geompy.MakeCylinder(Vertex_12, OY, 9, 2)
+Fuse_3 = geompy.MakeFuse(Box_3, Cylinder_5)
+CanalCentral = geompy.MakeFuse(Fuse_3, Cylinder_6)
+
+#geompy.addToStudy( Vertex_9, 'Vertex_9' )
+#geompy.addToStudy( Vertex_10, 'Vertex_10' )
+#geompy.addToStudy( Vertex_11, 'Vertex_11' )
+#geompy.addToStudy( Vertex_12, 'Vertex_12' )
+#geompy.addToStudy( Box_3, 'Box_3' )
+#geompy.addToStudy( Cylinder_5, 'Cylinder_5' )
+#geompy.addToStudy( Cylinder_6, 'Cylinder_6' )
+#geompy.addToStudy( Fuse_3, 'Fuse_3' )
+#geompy.addToStudy( CanalCentral, 'CanalCentral' )
+
+
+
+# Canal 1. En una vista superior (mirando a los canales), canal 1 es el que se encuentra mas alejado
+# en Y positivo.
+Vertex_13 = geompy.MakeVertex(-26.75, 5, 1)
+Vertex_14 = geompy.MakeVertex(26.75, 7, 6.6)
+Vertex_15 = geompy.MakeVertex(-26.75, 5, 10)
+Vertex_16 = geompy.MakeVertex(26.75, 5, 10)
+Box_4 = geompy.MakeBoxTwoPnt(Vertex_13, Vertex_14)
+Cylinder_7 = geompy.MakeCylinder(Vertex_15, OY, 9, 2)
+Cylinder_8 = geompy.MakeCylinder(Vertex_16, OY, 9, 2)
+Fuse_4 = geompy.MakeFuse(Box_4, Cylinder_7)
+Canal1 = geompy.MakeFuse(Fuse_4, Cylinder_8)
+
+#geompy.addToStudy( Vertex_13, 'Vertex_13' )
+#geompy.addToStudy( Vertex_14, 'Vertex_14' )
+#geompy.addToStudy( Vertex_15, 'Vertex_15' )
+#geompy.addToStudy( Vertex_16, 'Vertex_16' )
+#geompy.addToStudy( Box_4, 'Box_4' )
+#geompy.addToStudy( Cylinder_7, 'Cylinder_7' )
+#geompy.addToStudy( Cylinder_8, 'Cylinder_8' )
+#geompy.addToStudy( Fuse_4, 'Fuse_4' )
+#geompy.addToStudy( Canal1, 'Canal1' )
+
+
+
+
+# Canal 2
+Vertex_17 = geompy.MakeVertex(-30.25, 2, 1)
+Vertex_18 = geompy.MakeVertex(30.25, 4, 6.6)
+Vertex_19 = geompy.MakeVertex(-30.25, 2, 10)
+Vertex_20 = geompy.MakeVertex(30.25, 2, 10)
+Box_5 = geompy.MakeBoxTwoPnt(Vertex_17, Vertex_18)
+Cylinder_9 = geompy.MakeCylinder(Vertex_19, OY, 9, 2)
+Cylinder_10 = geompy.MakeCylinder(Vertex_20, OY, 9, 2)
+Fuse_5 = geompy.MakeFuse(Box_5, Cylinder_9)
+Canal2 = geompy.MakeFuse(Fuse_5, Cylinder_10)
+
+#geompy.addToStudy( Vertex_17, 'Vertex_17' )
+#geompy.addToStudy( Vertex_18, 'Vertex_18' )
+#geompy.addToStudy( Vertex_19, 'Vertex_19' )
+#geompy.addToStudy( Vertex_20, 'Vertex_20' )
+#geompy.addToStudy( Box_5, 'Box_5' )
+#geompy.addToStudy( Cylinder_9, 'Cylinder_9' )
+#geompy.addToStudy( Cylinder_10, 'Cylinder_10' )
+#geompy.addToStudy( Fuse_5, 'Fuse_5' )
+#geompy.addToStudy( Canal2, 'Canal2' )
+
+
+
+# Canal 4 (copia y traslacion de canal 2)
+Canal4 = geompy.MakeTranslationVectorDistance(Canal2, OY, -6)
+#geompy.addToStudy( Canal4, 'Canal4' )
+
+# Canal 5 (copia y traslacion de canal 1)
+Canal5 = geompy.MakeTranslationVectorDistance(Canal1, OY, -12)
+#geompy.addToStudy( Canal5, 'Canal5' )
+
+# Remocion de los canales de la tapa solida
+Cut_1 = geompy.MakeCut(Tapa_SinCanales, CanalCentral)
+Cut_2 = geompy.MakeCut(Cut_1, Canal1)
+Cut_3 = geompy.MakeCut(Cut_2, Canal2)
+Cut_4 = geompy.MakeCut(Cut_3, Canal4)
+Tapa_ConCanales = geompy.MakeCut(Cut_4, Canal5)
+
+#geompy.addToStudy( Cut_1, 'Cut_1' )
+#geompy.addToStudy( Cut_2, 'Cut_2' )
+#geompy.addToStudy( Cut_3, 'Cut_3' )
+#geompy.addToStudy( Cut_4, 'Cut_4' )
+#geompy.addToStudy( Tapa_ConCanales, 'Tapa_ConCanales' )
+
+
+
+# Creacion del calado rectangular central
+Vertex_21 = geompy.MakeVertex(-31, -7.5, 5.5)
+Vertex_22 = geompy.MakeVertex(31, 7.5, 6.6)
+Box_6 = geompy.MakeBoxTwoPnt(Vertex_21, Vertex_22)
+Tapa = geompy.MakeCut(Tapa_ConCanales, Box_6)
+
+#geompy.addToStudy( Vertex_21, 'Vertex_21' )
+#geompy.addToStudy( Vertex_22, 'Vertex_22' )
+#geompy.addToStudy( Box_6, 'Box_6' )
+#geompy.addToStudy( Tapa, 'Tapa' )
+
+
+
+
+# Rotacion y traslacion a la posicion final
+Tapa_rotada = geompy.MakeRotation(Tapa, OX, 180*math.pi/180.0)
+TapaFinal = geompy.MakeTranslationVectorDistance(Tapa_rotada, OZ, 35)
+#geompy.addToStudy( Tapa_rotada, 'Tapa_rotada' )
+geompy.addToStudy( TapaFinal, 'TapaFinal' )
+
+
+
+
+
+#-----------------------------------------------------------------------#
+#                               CUERPO                                  #
+#-----------------------------------------------------------------------#
+
+# Se construye inicialmente con la parte inferior en el plano Z = 0. Las partes se construyen siguiendo la direccion
+# positiva del eje Z.
+
+# Parte inferior (mayor)
+Vertex_23 = geompy.MakeVertex(-40, -25, 0)
+Vertex_24 = geompy.MakeVertex(40, 25, 15)
+Vertex_25 = geompy.MakeVertex(-40, 0, 0)
+Vertex_26 = geompy.MakeVertex(40, 0, 0)
+Box_7 = geompy.MakeBoxTwoPnt(Vertex_23, Vertex_24)
+Cylinder_11 = geompy.MakeCylinder(Vertex_25, OZ, 25, 15)
+Cylinder_12 = geompy.MakeCylinder(Vertex_26, OZ, 25, 15)
+Fuse_6 = geompy.MakeFuse(Box_7, Cylinder_11)
+Cuerpo_inf = geompy.MakeFuse(Fuse_6, Cylinder_12)
+
+#geompy.addToStudy( Vertex_23, 'Vertex_23' )
+#geompy.addToStudy( Vertex_24, 'Vertex_24' )
+#geompy.addToStudy( Vertex_25, 'Vertex_25' )
+#geompy.addToStudy( Vertex_26, 'Vertex_26' )
+#geompy.addToStudy( Box_7, 'Box_7' )
+#geompy.addToStudy( Cylinder_11, 'Cylinder_11' )
+#geompy.addToStudy( Cylinder_12, 'Cylinder_12' )
+#geompy.addToStudy( Fuse_6, 'Fuse_6' )
+#geompy.addToStudy( Cuerpo_inf, 'Cuerpo_inf' )
+
+
+
+# Parte superior (menor, donde se inserta la tapa)
+Vertex_27 = geompy.MakeVertex(-31, -19, 15)
+Vertex_28 = geompy.MakeVertex(31, 19, 31)
+Vertex_29 = geompy.MakeVertex(-31, 0, 15)
+Vertex_30 = geompy.MakeVertex(31, 0, 15)
+Box_8 = geompy.MakeBoxTwoPnt(Vertex_27, Vertex_28)
+Cylinder_13 = geompy.MakeCylinder(Vertex_29, OZ, 19, 16)
+Cylinder_14 = geompy.MakeCylinder(Vertex_30, OZ, 19, 16)
+Fuse_7 = geompy.MakeFuse(Box_8, Cylinder_13)
+Cuerpo_sup = geompy.MakeFuse(Fuse_7, Cylinder_14)
+
+#geompy.addToStudy( Vertex_27, 'Vertex_27' )
+#geompy.addToStudy( Vertex_28, 'Vertex_28' )
+#geompy.addToStudy( Vertex_30, 'Vertex_30' )
+#geompy.addToStudy( Cylinder_13, 'Cylinder_13' )
+#geompy.addToStudy( Box_8, 'Box_8' )
+#geompy.addToStudy( Vertex_29, 'Vertex_29' )
+#geompy.addToStudy( Cylinder_14, 'Cylinder_14' )
+#geompy.addToStudy( Fuse_7, 'Fuse_7' )
+#geompy.addToStudy( Cuerpo_sup, 'Cuerpo_sup' )
+
+
+
+# Cuerpo solido
+Cuerpo = geompy.MakeFuse(Cuerpo_inf, Cuerpo_sup)
+#geompy.addToStudy( Cuerpo, 'Cuerpo' )
+
+
+# Creacion de la geometria que es necesario calar del cuerpo (donde se inserta la tapa)
+Vertex_31 = geompy.MakeVertex(-32, -9, 28.4)
+Vertex_32 = geompy.MakeVertex(32, 9, 31)
+Vertex_33 = geompy.MakeVertex(-32, 0, 28.4)
+Vertex_34 = geompy.MakeVertex(32, 0, 28.4)
+Box_9 = geompy.MakeBoxTwoPnt(Vertex_31, Vertex_32)
+Cylinder_15 = geompy.MakeCylinder(Vertex_33, OZ, 9, 2.6)
+Cylinder_16 = geompy.MakeCylinder(Vertex_34, OZ, 9, 2.6)
+Fuse_8 = geompy.MakeFuse(Box_9, Cylinder_15)
+Calado_Tapa = geompy.MakeFuse(Fuse_8, Cylinder_16)
+
+#geompy.addToStudy( Vertex_31, 'Vertex_31' )
+#geompy.addToStudy( Vertex_32, 'Vertex_32' )
+#geompy.addToStudy( Vertex_33, 'Vertex_33' )
+#geompy.addToStudy( Vertex_34, 'Vertex_34' )
+#geompy.addToStudy( Box_9, 'Box_9' )
+#geompy.addToStudy( Cylinder_15, 'Cylinder_15' )
+#geompy.addToStudy( Cylinder_16, 'Cylinder_16' )
+#geompy.addToStudy( Fuse_8, 'Fuse_8' )
+#geompy.addToStudy( Calado_Tapa, 'Calado_Tapa' )
+
+
+
+
+# Explosion del calado de la tapa en edges, para usarlos en la construccion del porotito de inlet
+[ParaPoroto,Edge_2,Edge_3,Edge_4,Edge_5,Edge_6,Edge_7,Edge_8,Edge_9,Edge_10,Edge_11,Edge_12,Edge_13,Edge_14,Edge_15,Edge_16,Edge_17,Edge_18,Edge_19,Edge_20,Edge_21,Edge_22,Edge_23,Edge_24,Edge_25] = geompy.ExtractShapes(Calado_Tapa, geompy.ShapeType["EDGE"], True)
+
+#geompy.addToStudyInFather( Calado_Tapa, ParaPoroto, 'ParaPoroto' )
+#geompy.addToStudyInFather( Calado_Tapa, Edge_2, 'Edge_2' )
+#geompy.addToStudyInFather( Calado_Tapa, Edge_3, 'Edge_3' )
+#geompy.addToStudyInFather( Calado_Tapa, Edge_4, 'Edge_4' )
+#geompy.addToStudyInFather( Calado_Tapa, Edge_5, 'Edge_5' )
+#geompy.addToStudyInFather( Calado_Tapa, Edge_6, 'Edge_6' )
+#geompy.addToStudyInFather( Calado_Tapa, Edge_7, 'Edge_7' )
+#geompy.addToStudyInFather( Calado_Tapa, Edge_8, 'Edge_8' )
+#geompy.addToStudyInFather( Calado_Tapa, Edge_9, 'Edge_9' )
+#geompy.addToStudyInFather( Calado_Tapa, Edge_10, 'Edge_10' )
+#geompy.addToStudyInFather( Calado_Tapa, Edge_11, 'Edge_11' )
+#geompy.addToStudyInFather( Calado_Tapa, Edge_12, 'Edge_12' )
+#geompy.addToStudyInFather( Calado_Tapa, Edge_13, 'Edge_13' )
+#geompy.addToStudyInFather( Calado_Tapa, Edge_14, 'Edge_14' )
+#geompy.addToStudyInFather( Calado_Tapa, Edge_15, 'Edge_15' )
+#geompy.addToStudyInFather( Calado_Tapa, Edge_16, 'Edge_16' )
+#geompy.addToStudyInFather( Calado_Tapa, Edge_17, 'Edge_17' )
+#geompy.addToStudyInFather( Calado_Tapa, Edge_18, 'Edge_18' )
+#geompy.addToStudyInFather( Calado_Tapa, Edge_19, 'Edge_19' )
+#geompy.addToStudyInFather( Calado_Tapa, Edge_20, 'Edge_20' )
+#geompy.addToStudyInFather( Calado_Tapa, Edge_21, 'Edge_21' )
+#geompy.addToStudyInFather( Calado_Tapa, Edge_22, 'Edge_22' )
+#geompy.addToStudyInFather( Calado_Tapa, Edge_23, 'Edge_23' )
+#geompy.addToStudyInFather( Calado_Tapa, Edge_24, 'Edge_24' )
+#geompy.addToStudyInFather( Calado_Tapa, Edge_25, 'Edge_25' )
+
+
+
+
+# Creacion de la geometria que es necesario calar del cuerpo (donde se inserta el allring)
+Vertex_35 = geompy.MakeVertex(-31.95, -11.15, 29.8)
+Vertex_36 = geompy.MakeVertex(31.95, 11.15, 31)
+Vertex_37 = geompy.MakeVertex(-31.95, 0, 29.8)
+Vertex_38 = geompy.MakeVertex(31.95, 0, 29.8)
+Box_10 = geompy.MakeBoxTwoPnt(Vertex_35, Vertex_36)
+Cylinder_17 = geompy.MakeCylinder(Vertex_37, OZ, 11.15, 1.2)
+Cylinder_18 = geompy.MakeCylinder(Vertex_38, OZ, 11.15, 1.2)
+Fuse_9 = geompy.MakeFuse(Box_10, Cylinder_17)
+Calado_Allring = geompy.MakeFuse(Fuse_9, Cylinder_18)
+
+#geompy.addToStudy( Vertex_35, 'Vertex_35' )
+#geompy.addToStudy( Vertex_36, 'Vertex_36' )
+#geompy.addToStudy( Vertex_37, 'Vertex_37' )
+#geompy.addToStudy( Vertex_38, 'Vertex_38' )
+#geompy.addToStudy( Box_10, 'Box_10' )
+#geompy.addToStudy( Cylinder_17, 'Cylinder_17' )
+#geompy.addToStudy( Cylinder_18, 'Cylinder_18' )
+#geompy.addToStudy( Fuse_9, 'Fuse_9' )
+#geompy.addToStudy( Calado_Allring, 'Calado_Allring' )
+
+
+
+# Creacion del canal de entrada
+Vertex_39 = geompy.MakeVertex(-37, 0, 0)
+Vertex_40 = geompy.MakeVertex(-37, 0, 2.5)
+Vertex_41 = geompy.MakeVertex(-37, 0, 16)
+Cone_1 = geompy.MakeCone(Vertex_39, OZ, 8.66985, 8, 2.5)
+Cylinder_19 = geompy.MakeCylinder(Vertex_40, OZ, 8, 13.5)
+Cone_2 = geompy.MakeCone(Vertex_41, OZ, 8, 1.649147, 11)
+Fuse_10 = geompy.MakeFuse(Cone_1, Cylinder_19)
+Inlet_Cono1 = geompy.MakeFuse(Fuse_10, Cone_2)
+
+#geompy.addToStudy( Vertex_39, 'Vertex_39' )
+#geompy.addToStudy( Vertex_40, 'Vertex_40' )
+#geompy.addToStudy( Vertex_41, 'Vertex_41' )
+#geompy.addToStudy( Cone_1, 'Cone_1' )
+#geompy.addToStudy( Cylinder_19, 'Cylinder_19' )
+#geompy.addToStudy( Cone_2, 'Cone_2' )
+#geompy.addToStudy( Fuse_10, 'Fuse_10' )
+#geompy.addToStudy( Inlet_Cono1, 'Inlet_Cono1' )
+
+
+
+
+# Construccion del "porotito", la seccion de entrada a la pieza. Armado por interseccion de circulos
+Vertex_42 = geompy.MakeVertex(-31.9, 0, 28.4)
+Circle_1 = geompy.MakeCircle(Vertex_42, None, 6.05)
+NewObject_1 = geompy.DivideEdge(Circle_1, -1, 0.355555555, 1)
+[Vertex_43,Vertex_44] = geompy.ExtractShapes(NewObject_1, geompy.ShapeType["VERTEX"], True)
+NewObject_2 = geompy.DivideEdge(Circle_1, -1, 0.644444444, 1)
+[Vertex_45,Vertex_46] = geompy.ExtractShapes(NewObject_2, geompy.ShapeType["VERTEX"], True)
+NewObject_3 = geompy.DivideEdge(ParaPoroto, -1, 0.206922777, 1)
+[Edge_1,Edge_26] = geompy.ExtractShapes(NewObject_3, geompy.ShapeType["EDGE"], True)
+[Poroto4,Vertex_51,Vertex_52] = geompy.ExtractShapes(NewObject_3, geompy.ShapeType["VERTEX"], True)
+NewObject_4 = geompy.DivideEdge(ParaPoroto, -1, 0.793077222, 1)
+[Edge_27,Edge_28] = geompy.ExtractShapes(NewObject_4, geompy.ShapeType["EDGE"], True)
+[Poroto6,Vertex_48,Vertex_49] = geompy.ExtractShapes(NewObject_4, geompy.ShapeType["VERTEX"], True)
+Circle_2 = geompy.MakeCircle(Vertex_42, None, 3.1)
+NewObject_5 = geompy.DivideEdge(Circle_2, -1, 0.355555555, 1)
+[Poroto2,Vertex_54] = geompy.ExtractShapes(NewObject_5, geompy.ShapeType["VERTEX"], True)
+NewObject_6 = geompy.DivideEdge(Circle_2, -1, 0.644444444, 1)
+[Poroto8,Vertex_56] = geompy.ExtractShapes(NewObject_6, geompy.ShapeType["VERTEX"], True)
+Circle_3 = geompy.MakeCircle(Vertex_43, None, 3)
+Circle_4 = geompy.MakeCircle(Vertex_45, None, 3)
+NewObject_7 = geompy.DivideEdge(Circle_3, -1, 0, 1)
+[Poroto3] = geompy.ExtractShapes(NewObject_7, geompy.ShapeType["VERTEX"], True)
+NewObject_8 = geompy.DivideEdge(Circle_4, -1, 0, 1)
+[Poroto7] = geompy.ExtractShapes(NewObject_8, geompy.ShapeType["VERTEX"], True)
+Arc1_poroto = geompy.MakeCommon(Edge_1, Edge_27)
+Poroto1 = geompy.MakeVertex(-35, 0, 28.4)
+Arc_1 = geompy.MakeArc(Poroto2, Poroto1, Poroto8)
+Arc_2 = geompy.MakeArc(Poroto4, Poroto3, Poroto2)
+Arc_3 = geompy.MakeArc(Poroto8, Poroto7, Poroto6)
+Poroto_Face = geompy.MakeFaceWires([Arc1_poroto, Arc_1, Arc_2, Arc_3], 1)
+
+#geompy.addToStudy( Vertex_42, 'Vertex_42' )
+#geompy.addToStudy( NewObject_2, 'NewObject_2' )
+#geompy.addToStudyInFather( NewObject_1, Vertex_43, 'Vertex_43' )
+#geompy.addToStudy( Circle_1, 'Circle_1' )
+#geompy.addToStudy( NewObject_1, 'NewObject_1' )
+#geompy.addToStudyInFather( NewObject_1, Vertex_44, 'Vertex_44' )
+#geompy.addToStudyInFather( NewObject_2, Vertex_45, 'Vertex_45' )
+#geompy.addToStudyInFather( NewObject_2, Vertex_46, 'Vertex_46' )
+#geompy.addToStudy( NewObject_3, 'NewObject_3' )
+#geompy.addToStudy( NewObject_4, 'NewObject_4' )
+#geompy.addToStudyInFather( NewObject_3, Edge_1, 'Edge_1' )
+#geompy.addToStudyInFather( NewObject_3, Edge_26, 'Edge_26' )
+#geompy.addToStudyInFather( NewObject_4, Edge_27, 'Edge_27' )
+#geompy.addToStudyInFather( NewObject_4, Edge_28, 'Edge_28' )
+#geompy.addToStudyInFather( NewObject_4, Poroto6, 'Poroto6' )
+#geompy.addToStudyInFather( NewObject_4, Vertex_48, 'Vertex_48' )
+#geompy.addToStudyInFather( NewObject_4, Vertex_49, 'Vertex_49' )
+#geompy.addToStudyInFather( NewObject_3, Poroto4, 'Poroto4' )
+#geompy.addToStudyInFather( NewObject_3, Vertex_51, 'Vertex_51' )
+#geompy.addToStudyInFather( NewObject_3, Vertex_52, 'Vertex_52' )
+#geompy.addToStudy( Circle_2, 'Circle_2' )
+#geompy.addToStudy( NewObject_5, 'NewObject_5' )
+#geompy.addToStudy( NewObject_6, 'NewObject_6' )
+#geompy.addToStudyInFather( NewObject_5, Poroto2, 'Poroto2' )
+#geompy.addToStudyInFather( NewObject_5, Vertex_54, 'Vertex_54' )
+#geompy.addToStudyInFather( NewObject_6, Poroto8, 'Poroto8' )
+#geompy.addToStudyInFather( NewObject_6, Vertex_56, 'Vertex_56' )
+#geompy.addToStudy( Circle_3, 'Circle_3' )
+#geompy.addToStudy( Circle_4, 'Circle_4' )
+#geompy.addToStudy( NewObject_7, 'NewObject_7' )
+#geompy.addToStudy( NewObject_8, 'NewObject_8' )
+#geompy.addToStudyInFather( NewObject_7, Poroto3, 'Poroto3' )
+#geompy.addToStudyInFather( NewObject_8, Poroto7, 'Poroto7' )
+#geompy.addToStudy( Arc1_poroto, 'Arc1_poroto' )
+#geompy.addToStudy( Poroto1, 'Poroto1' )
+#geompy.addToStudy( Arc_1, 'Arc_1' )
+#geompy.addToStudy( Arc_2, 'Arc_2' )
+#geompy.addToStudy( Arc_3, 'Arc_3' )
+#geompy.addToStudy( Poroto_Face, 'Poroto_Face' )
+
+
+
+
+# Extrusion del poroto
+#geomObj_1 = geompy.MakeTranslationVectorDistance(Poroto_Face, OZ, 0.1)
+#geomObj_2 = geompy.MakePrismVecH(geomObj_1, OZ, -16)
+Poroto_Extruded = geompy.MakePrismVecH(Poroto_Face, OZ, -15)
+
+# Canal de ingreso. Fusion de los conos con el poroto extrudado
+#geomObj_3 = geompy.MakeFuse(geomObj_2, Inlet_Cono1)
+Canal_Inlet = geompy.MakeFuse(Inlet_Cono1, Poroto_Extruded)
+
+# Canal de salida. Creacion por copia y rotacion del canal de ingreso
+#geomObj_4 = geompy.MakeRotation(geomObj_3, OZ, 180*math.pi/180.0)
+Canal_Outlet = geompy.MakeRotation(Canal_Inlet, OZ, 180*math.pi/180.0)
+
+# Procesado de los canales de entrada y salida para mejorar tolerancias
+ProcessShape_1 = geompy.ProcessShape(Canal_Inlet, ["FixShape", "FixFaceSize", "DropSmallEdges", "SplitAngle", "ToBezier", "SameParameter"], ["FixShape.Tolerance3d", "FixShape.MaxTolerance3d", "FixFaceSize.Tolerance", "DropSmallEdges.Tolerance3d", "SplitAngle.Angle", "SplitAngle.MaxTolerance", "ToBezier.SurfaceMode", "ToBezier.Curve3dMode", "ToBezier.Curve2dMode", "ToBezier.MaxTolerance", "SameParameter.Tolerance3d"], ["1e-10", "1e-10", "1e-10", "1e-10", "3.14159", "1e-10", "0", "1", "1", "1e-10", "1e-10"])
+ProcessShape_2 = geompy.ProcessShape(Canal_Outlet, ["FixShape", "FixFaceSize", "DropSmallEdges", "SplitAngle", "ToBezier", "SameParameter"], ["FixShape.Tolerance3d", "FixShape.MaxTolerance3d", "FixFaceSize.Tolerance", "DropSmallEdges.Tolerance3d", "SplitAngle.Angle", "SplitAngle.MaxTolerance", "ToBezier.SurfaceMode", "ToBezier.Curve3dMode", "ToBezier.Curve2dMode", "ToBezier.MaxTolerance", "SameParameter.Tolerance3d"], ["1e-10", "1e-10", "1e-10", "1e-10", "3.14159", "1e-10", "0", "1", "1", "1e-10", "1e-10"])
+
+
+# Creacion del orificio central del cuerpo
+Vertex_47 = geompy.MakeVertex(0, 0, 0)
+Vertex_50 = geompy.MakeVertex(0, 0, 2)
+Vertex_53 = geompy.MakeVertex(0, 0, 16)
+Cone_3 = geompy.MakeCone(Vertex_47, OZ, 8, 6, 2)
+Cone_4 = geompy.MakeCone(Vertex_53, OZ, 6, 0, 2)
+Cylinder_20 = geompy.MakeCylinder(Vertex_50, OZ, 6, 14)
+Fuse_13 = geompy.MakeFuse(Cone_3, Cone_4)
+Orificio_central = geompy.MakeFuse(Fuse_13, Cylinder_20)
+
+#geompy.addToStudy( Vertex_47, 'Vertex_47' )
+#geompy.addToStudy( Vertex_50, 'Vertex_50' )
+#geompy.addToStudy( Vertex_53, 'Vertex_53' )
+#geompy.addToStudy( Cone_3, 'Cone_3' )
+#geompy.addToStudy( Cone_4, 'Cone_4' )
+#geompy.addToStudy( Cylinder_20, 'Cylinder_20' )
+#geompy.addToStudy( Fuse_13, 'Fuse_13' )
+#geompy.addToStudy( Orificio_central, 'Orificio_central' )
+
+
+
+# Remocion de las caladuras. Creacion del cuerpo final
+Cut_5 = geompy.MakeCut(Cuerpo, Calado_Tapa)
+Cut_6 = geompy.MakeCut(Cut_5, Calado_Allring)
+Cut_7 = geompy.MakeCut(Cut_6, Canal_Inlet)
+Cut_8 = geompy.MakeCut(Cut_7, Canal_Outlet)
+CuerpoFinal = geompy.MakeCut(Cut_8, Orificio_central)
+
+geompy.addToStudy( CuerpoFinal, 'CuerpoFinal' )
+
+
+
+#-----------------------------------------------------------------------#
+#                               BLANCO                                  #
+#-----------------------------------------------------------------------#
+
+Vertex_55 = geompy.MakeVertex(-40, -5, 35)
+Vertex_57 = geompy.MakeVertex(40, 5, 35.1)
+Blanco = geompy.MakeBoxTwoPnt(Vertex_55, Vertex_57)
+
+#geompy.addToStudy( Vertex_55, 'Vertex_55' )
+#geompy.addToStudy( Vertex_57, 'Vertex_57' )
+geompy.addToStudy( Blanco, 'Blanco' )
+
+
+
+
+#-----------------------------------------------------------------------#
+#                              SOPORTE                                  #
+#-----------------------------------------------------------------------#
+
+# Construccion del soporte. Fusion del cuerpo, tapa y blanco
+Cuerpo_Tapa = geompy.MakeFuse(CuerpoFinal, TapaFinal)
+SoporteFinal = geompy.MakeFuse(Cuerpo_Tapa, Blanco)
+
+geompy.addToStudy( Cuerpo_Tapa, 'Cuerpo+Tapa' )
+geompy.addToStudy( SoporteFinal, 'SoporteFinal' )
+
+
+# Particion del soporte
+Soporte_Partition = geompy.MakePartition([SoporteFinal], [TapaFinal, Blanco, CuerpoFinal], [], [], geompy.ShapeType["SOLID"], 0, [], 0)
+
+# Corte del soporte por la mitad
+Extrusion_2 = geompy.MakePrismVecH(Plane_OZX, OY, -40)
+Soporte_Mitad = geompy.MakeCut(Soporte_Partition, Extrusion_2)
+geompy.addToStudy( Soporte_Mitad, 'Soporte_Mitad' )
+
+# Division de solidos
+[Blanco_1,Tapa_1,Cuerpo_1] = geompy.ExtractShapes(Soporte_Mitad, geompy.ShapeType["SOLID"], True)
+geompy.addToStudyInFather( Soporte_Mitad, Tapa_1, 'Tapa' )
+geompy.addToStudyInFather( Soporte_Mitad, Cuerpo_1, 'Cuerpo' )
+geompy.addToStudyInFather( Soporte_Mitad, Blanco_1, 'Blanco' )
+
+
+
+# Explosion del blanco y agrupamiento  de caras
+[Face_93,Face_94,Face_95,Face_96,Face_97,Face_98,Face_99,Face_100,Face_101,Face_102] = geompy.ExtractShapes(Blanco_1, geompy.ShapeType["FACE"], True)
+
+Blanco_to_Tapa = geompy.CreateGroup(Blanco_1, geompy.ShapeType["FACE"])
+geompy.UnionIDs(Blanco_to_Tapa, [21, 33, 43, 53, 58])
+
+BlancoTop = geompy.CreateGroup(Blanco_1, geompy.ShapeType["FACE"])
+geompy.UnionIDs(BlancoTop, [38])
+
+BlancoSide = geompy.CreateGroup(Blanco_1, geompy.ShapeType["FACE"])
+geompy.UnionIDs(BlancoSide, [28, 3, 48])
+
+SymPlane_Blanco = geompy.CreateGroup(Blanco_1, geompy.ShapeType["FACE"])
+geompy.UnionIDs(SymPlane_Blanco, [61])
+
+geompy.addToStudyInFather( Blanco_1, Face_94, 'Face_94' )
+geompy.addToStudyInFather( Blanco_1, Face_93, 'Face_93' )
+geompy.addToStudyInFather( Blanco_1, Face_95, 'Face_95' )
+geompy.addToStudyInFather( Blanco_1, Face_96, 'Face_96' )
+geompy.addToStudyInFather( Blanco_1, Face_97, 'Face_97' )
+geompy.addToStudyInFather( Blanco_1, Face_98, 'Face_98' )
+geompy.addToStudyInFather( Blanco_1, Face_99, 'Face_99' )
+geompy.addToStudyInFather( Blanco_1, Face_100, 'Face_100' )
+geompy.addToStudyInFather( Blanco_1, Face_101, 'Face_101' )
+geompy.addToStudyInFather( Blanco_1, Face_102, 'Face_102' )
+geompy.addToStudyInFather( Blanco_1, Blanco_to_Tapa, 'Blanco_to_Tapa' )
+geompy.addToStudyInFather( Blanco_1, BlancoTop, 'BlancoTop' )
+geompy.addToStudyInFather( Blanco_1, BlancoSide, 'BlancoSide' )
+geompy.addToStudyInFather( Blanco_1, SymPlane_Blanco, 'SymPlane' )
+
+
+
+
+# Explosion de la tapa y agrupamiento  de caras
+[Face_1_1,Face_2,Face_3_1,Face_4_1,Face_5_1,Face_6_1,Face_7_1,Face_8,Blanco_1_1,Face_10_1,Face_11_1,Face_12_1,Face_13_1,Face_14_1,Face_15_1,Face_16_1,Face_17_1,Face_18_1,Face_19,Face_20_1,Face_21_1,Face_22_1,Face_23_1,Face_24_1,Face_25_1,Face_26_1,Face_27_1,Face_28_1,Face_29_1,Face_30,Face_31,Face_32_1,Face_33_1,Blanco_2,SymPlane_1,Face_36_1,Face_37_1,Face_38_1,Face_39_1,Blanco_3,Face_41,Face_42_1,Face_43_1,Face_44_1,Face_45_1,Face_46_1,Face_47_1,Face_48_1,Face_49_1,Face_50_1,Face_51_1,Face_52,Face_53_1,Face_54_1,Face_55_1,Blanco_4,Face_57_1,Face_58_1,Face_59_1,Face_60_1,Face_61_1,Face_62_1,Face_63,Face_64_1,Face_65_1,Face_66_1,Face_67_1,Face_68_1,Face_69_1,Face_70_1,Face_71_1,Face_72_1,Face_73_1,Face_74,Face_75,Face_76,Face_77,Face_78,Face_79,Face_80,Blanco_5,Face_82,Face_83,Face_84,Face_85,Face_86,Face_87,Face_88,Face_89] = geompy.ExtractShapes(Tapa_1, geompy.ShapeType["FACE"], True)
+
+Tapa_to_Fluid = geompy.CreateGroup(Tapa_1, geompy.ShapeType["FACE"])
+#geompy.UnionIDs(Tapa_to_Fluid, [159, 182, 291, 268, 280, 296, 275, 323, 440, 463, 489, 312, 328, 435, 453, 479, 482, 504, 187, 337, 443, 544, 456, 546, 466, 548, 485, 550, 494, 542, 531, 523, 539, 534, 507, 372, 356, 537, 526, 520, 367, 404, 388, 344, 399, 192, 197])
+geompy.UnionIDs(Tapa_to_Fluid, [159, 182, 291, 268, 280, 296, 323, 440, 463, 489, 312, 328, 435, 453, 479, 482, 504, 187, 337, 443, 544, 456, 546, 466, 548, 485, 550, 494, 542, 531, 523, 539, 534, 507, 372, 356, 537, 526, 520, 367, 404, 388, 344, 399, 192, 197])
+#geompy.DifferenceIDs(Tapa_to_Fluid, [159, 182, 291, 268, 280, 296, 275, 323, 440, 463, 489, 312, 328, 435, 453, 479, 482, 504, 187, 337, 443, 544, 456, 546, 466, 548, 485, 550, 494, 542, 531, 523, 539, 534, 507, 372, 356, 537, 526, 520, 367, 404, 388, 344, 399, 192, 197])
+
+Tapa_to_Cuerpo = geompy.CreateGroup(Tapa_1, geompy.ShapeType["FACE"])
+geompy.UnionIDs(Tapa_to_Cuerpo, [95, 150, 275, 260, 307, 430, 460, 418, 122, 425, 265, 34, 119, 515, 512, 529, 383, 415, 351, 222, 112])
+
+Tapa_to_Allring = geompy.CreateGroup(Tapa_1, geompy.ShapeType["FACE"])
+geompy.UnionIDs(Tapa_to_Allring, [138, 145, 246, 249, 125, 243, 229, 234])
+
+OutsideTapa = geompy.CreateGroup(Tapa_1, geompy.ShapeType["FACE"])
+geompy.UnionIDs(OutsideTapa, [20, 102, 53, 13, 3, 41, 107, 27])
+
+Tapa_to_Blanco = geompy.CreateGroup(Tapa_1, geompy.ShapeType["FACE"])
+geompy.UnionIDs(Tapa_to_Blanco, [241, 135, 46, 132, 239])
+
+SymPlane_Tapa = geompy.CreateGroup(Tapa_1, geompy.ShapeType["FACE"])
+geompy.UnionIDs(SymPlane_Tapa, [58])
+
+Superior_paraVL = geompy.CreateGroup(Tapa_1, geompy.ShapeType["FACE"])
+geompy.UnionIDs(Superior_paraVL, [102, 241, 53, 135, 46, 13, 132, 41, 239, 107])
+
+geompy.addToStudyInFather( Tapa_1, Face_1_1, 'Face_1' )
+geompy.addToStudyInFather( Tapa_1, Face_2, 'Face_2' )
+geompy.addToStudyInFather( Tapa_1, Face_3_1, 'Face_3' )
+geompy.addToStudyInFather( Tapa_1, Face_4_1, 'Face_4' )
+geompy.addToStudyInFather( Tapa_1, Face_5_1, 'Face_5' )
+geompy.addToStudyInFather( Tapa_1, Face_6_1, 'Face_6' )
+geompy.addToStudyInFather( Tapa_1, Face_7_1, 'Face_7' )
+geompy.addToStudyInFather( Tapa_1, Face_8, 'Face_8' )
+geompy.addToStudyInFather( Tapa_1, Blanco_1_1, 'Blanco_1' )
+geompy.addToStudyInFather( Tapa_1, Face_10_1, 'Face_10' )
+geompy.addToStudyInFather( Tapa_1, Face_11_1, 'Face_11' )
+geompy.addToStudyInFather( Tapa_1, Face_12_1, 'Face_12' )
+geompy.addToStudyInFather( Tapa_1, Face_13_1, 'Face_13' )
+geompy.addToStudyInFather( Tapa_1, Face_14_1, 'Face_14' )
+geompy.addToStudyInFather( Tapa_1, Face_15_1, 'Face_15' )
+geompy.addToStudyInFather( Tapa_1, Face_16_1, 'Face_16' )
+geompy.addToStudyInFather( Tapa_1, Face_17_1, 'Face_17' )
+geompy.addToStudyInFather( Tapa_1, Face_18_1, 'Face_18' )
+geompy.addToStudyInFather( Tapa_1, Face_19,   'Face_19' )
+geompy.addToStudyInFather( Tapa_1, Face_20_1, 'Face_20' )
+geompy.addToStudyInFather( Tapa_1, Face_21_1, 'Face_21' )
+geompy.addToStudyInFather( Tapa_1, Face_22_1, 'Face_22' )
+geompy.addToStudyInFather( Tapa_1, Face_23_1, 'Face_23' )
+geompy.addToStudyInFather( Tapa_1, Face_24_1, 'Face_24' )
+geompy.addToStudyInFather( Tapa_1, Face_25_1, 'Face_25' )
+geompy.addToStudyInFather( Tapa_1, Face_26_1, 'Face_26' )
+geompy.addToStudyInFather( Tapa_1, Face_27_1, 'Face_27' )
+geompy.addToStudyInFather( Tapa_1, Face_28_1, 'Face_28' )
+geompy.addToStudyInFather( Tapa_1, Face_29_1, 'Face_29' )
+geompy.addToStudyInFather( Tapa_1, Face_30, 'Face_30' )
+geompy.addToStudyInFather( Tapa_1, Face_31, 'Face_31' )
+geompy.addToStudyInFather( Tapa_1, Face_32_1, 'Face_32' )
+geompy.addToStudyInFather( Tapa_1, Face_33_1, 'Face_33' )
+geompy.addToStudyInFather( Tapa_1, Blanco_2, 'Blanco_2' )
+geompy.addToStudyInFather( Tapa_1, SymPlane_1, 'SymPlane' )
+geompy.addToStudyInFather( Tapa_1, Face_36_1, 'Face_36' )
+geompy.addToStudyInFather( Tapa_1, Face_37_1, 'Face_37' )
+geompy.addToStudyInFather( Tapa_1, Face_38_1, 'Face_38' )
+geompy.addToStudyInFather( Tapa_1, Face_39_1, 'Face_39' )
+geompy.addToStudyInFather( Tapa_1, Blanco_3, 'Blanco_3' )
+geompy.addToStudyInFather( Tapa_1, Face_41, 'Face_41' )
+geompy.addToStudyInFather( Tapa_1, Face_42_1, 'Face_42' )
+geompy.addToStudyInFather( Tapa_1, Face_43_1, 'Face_43' )
+geompy.addToStudyInFather( Tapa_1, Face_44_1, 'Face_44' )
+geompy.addToStudyInFather( Tapa_1, Face_45_1, 'Face_45' )
+geompy.addToStudyInFather( Tapa_1, Face_46_1, 'Face_46' )
+geompy.addToStudyInFather( Tapa_1, Face_47_1, 'Face_47' )
+geompy.addToStudyInFather( Tapa_1, Face_48_1, 'Face_48' )
+geompy.addToStudyInFather( Tapa_1, Face_49_1, 'Face_49' )
+geompy.addToStudyInFather( Tapa_1, Face_50_1, 'Face_50' )
+geompy.addToStudyInFather( Tapa_1, Face_51_1, 'Face_51' )
+geompy.addToStudyInFather( Tapa_1, Face_52, 'Face_52' )
+geompy.addToStudyInFather( Tapa_1, Face_53_1, 'Face_53' )
+geompy.addToStudyInFather( Tapa_1, Face_54_1, 'Face_54' )
+geompy.addToStudyInFather( Tapa_1, Face_55_1, 'Face_55' )
+geompy.addToStudyInFather( Tapa_1, Blanco_4, 'Blanco_4' )
+geompy.addToStudyInFather( Tapa_1, Face_57_1, 'Face_57' )
+geompy.addToStudyInFather( Tapa_1, Face_58_1, 'Face_58' )
+geompy.addToStudyInFather( Tapa_1, Face_59_1, 'Face_59' )
+geompy.addToStudyInFather( Tapa_1, Face_60_1, 'Face_60' )
+geompy.addToStudyInFather( Tapa_1, Face_61_1, 'Face_61' )
+geompy.addToStudyInFather( Tapa_1, Face_62_1, 'Face_62' )
+geompy.addToStudyInFather( Tapa_1, Face_63, 'Face_63' )
+geompy.addToStudyInFather( Tapa_1, Face_64_1, 'Face_64' )
+geompy.addToStudyInFather( Tapa_1, Face_65_1, 'Face_65' )
+geompy.addToStudyInFather( Tapa_1, Face_66_1, 'Face_66' )
+geompy.addToStudyInFather( Tapa_1, Face_67_1, 'Face_67' )
+geompy.addToStudyInFather( Tapa_1, Face_68_1, 'Face_68' )
+geompy.addToStudyInFather( Tapa_1, Face_69_1, 'Face_69' )
+geompy.addToStudyInFather( Tapa_1, Face_70_1, 'Face_70' )
+geompy.addToStudyInFather( Tapa_1, Face_71_1, 'Face_71' )
+geompy.addToStudyInFather( Tapa_1, Face_72_1, 'Face_72' )
+geompy.addToStudyInFather( Tapa_1, Face_73_1, 'Face_73' )
+geompy.addToStudyInFather( Tapa_1, Face_74, 'Face_74' )
+geompy.addToStudyInFather( Tapa_1, Face_75, 'Face_75' )
+geompy.addToStudyInFather( Tapa_1, Face_76, 'Face_76' )
+geompy.addToStudyInFather( Tapa_1, Face_77, 'Face_77' )
+geompy.addToStudyInFather( Tapa_1, Face_78, 'Face_78' )
+geompy.addToStudyInFather( Tapa_1, Face_79, 'Face_79' )
+geompy.addToStudyInFather( Tapa_1, Face_80, 'Face_80' )
+geompy.addToStudyInFather( Tapa_1, Blanco_5, 'Blanco_5' )
+geompy.addToStudyInFather( Tapa_1, Face_82, 'Face_82' )
+geompy.addToStudyInFather( Tapa_1, Face_83, 'Face_83' )
+geompy.addToStudyInFather( Tapa_1, Face_84, 'Face_84' )
+geompy.addToStudyInFather( Tapa_1, Face_85, 'Face_85' )
+geompy.addToStudyInFather( Tapa_1, Face_86, 'Face_86' )
+geompy.addToStudyInFather( Tapa_1, Face_87, 'Face_87' )
+geompy.addToStudyInFather( Tapa_1, Face_89, 'Face_89' )
+geompy.addToStudyInFather( Tapa_1, Tapa_to_Fluid, 'Tapa_to_Fluid' )
+geompy.addToStudyInFather( Tapa_1, Tapa_to_Cuerpo, 'Tapa_to_Cuerpo' )
+geompy.addToStudyInFather( Tapa_1, Tapa_to_Allring, 'Tapa_to_Allring' )
+geompy.addToStudyInFather( Tapa_1, OutsideTapa, 'OutsideTapa' )
+geompy.addToStudyInFather( Tapa_1, Tapa_to_Blanco, 'Tapa_to_Blanco' )
+geompy.addToStudyInFather( Tapa_1, SymPlane_Tapa, 'SymPlane' )
+geompy.addToStudyInFather( Tapa_1, Superior_paraVL, 'Superior_paraVL' )
+
+
+
+
+# Explosion del cuerpo y agrupamiento  de caras
+[Face_1,SymPlane1,Face_3,Face_4,Face_5,Face_6,Face_7,Face_8_1,Face_9,Face_10,Face_11,Face_12,Face_13,Face_14,Face_15,
+Face_16,Face_17,Face_18,Face_19_1,Face_20,Face_21,Face_22,Face_23,Face_24,Face_25,Face_26,Face_27,Face_28,Face_29,
+Face_30_1,SymPlane_2,Face_32,Face_33,Face_34,Face_35,Face_36,Face_37,Face_38,Face_39,Face_40,Face_41_1,Face_42,Face_43,
+Face_44,Face_45,Face_46,Face_47,Face_48,Face_49,Face_50,Face_51,Face_52_1,Face_53,Face_54,Face_55,Face_56,Face_57,
+Face_58,Face_59,Face_60,Face_61,Face_62,Face_63_1,Face_64,Face_65,Face_66,Face_67,Face_68,Face_69,Face_70,Face_71,
+Face_72,Face_73,Face_74_1] = geompy.ExtractShapes(Cuerpo_1, geompy.ShapeType["FACE"], True)
+
+Cuerpo_to_Fluid = geompy.CreateGroup(Cuerpo_1, geompy.ShapeType["FACE"])
+#geompy.UnionIDs(Cuerpo_to_Fluid, [299, 279, 285, 288, 270, 429, 265, 408, 417, 238, 385, 392, 201, 192, 371, 182, 179, 185, 361, 233, 206])
+geompy.UnionIDs(Cuerpo_to_Fluid, [299, 279, 285, 288, 270, 429, 265, 408, 417, 238, 385, 392, 201, 192, 371, 182, 179, 185, 361, 233, 206, 462, 434])
+#geompy.DifferenceIDs(Cuerpo_to_Fluid, [299, 279, 285, 288, 270, 429, 265, 408, 417, 238, 385, 392, 201, 192, 371, 182, 179, 185, 361, 233, 206])
+
+Cuerpo_to_Tapa = geompy.CreateGroup(Cuerpo_1, geompy.ShapeType["FACE"])
+#geompy.UnionIDs(Cuerpo_to_Tapa, [304, 434, 325, 427, 436, 466, 405, 414, 424, 453, 401, 438, 364, 455, 388, 399, 396, 464, 381, 460, 462, 352, 333])
+geompy.UnionIDs(Cuerpo_to_Tapa, [304, 325, 427, 436, 466, 405, 414, 424, 453, 401, 438, 364, 455, 388, 399, 396, 464, 381, 460, 352, 333])
+#geompy.DifferenceIDs(Cuerpo_to_Tapa, [304, 434, 325, 427, 436, 466, 405, 414, 424, 453, 401, 438, 364, 455, 388, 399, 396, 464, 381, 460, 462, 352, 333])
+
+Cuerpo_to_Allring = geompy.CreateGroup(Cuerpo_1, geompy.ShapeType["FACE"])
+geompy.UnionIDs(Cuerpo_to_Allring, [320, 313, 445, 468, 448, 457, 345, 340])
+
+OutsideCuerpo = geompy.CreateGroup(Cuerpo_1, geompy.ShapeType["FACE"])
+geompy.UnionIDs(OutsideCuerpo, [24, 105, 100, 296, 176, 90, 293, 290, 87, 13, 167, 38, 3, 95, 162, 330, 159, 131, 31])
+
+SymPlane_Cuerpo = geompy.CreateGroup(Cuerpo_1, geompy.ShapeType["FACE"])
+geompy.UnionIDs(SymPlane_Cuerpo, [112, 45, 138])
+
+geompy.addToStudyInFather( Cuerpo_1, Face_1, 'Face_1' )
+geompy.addToStudyInFather( Cuerpo_1, SymPlane1, 'SymPlane1' )
+geompy.addToStudyInFather( Cuerpo_1, Face_3, 'Face_3' )
+geompy.addToStudyInFather( Cuerpo_1, Face_4, 'Face_4' )
+geompy.addToStudyInFather( Cuerpo_1, Face_5, 'Face_5' )
+geompy.addToStudyInFather( Cuerpo_1, Face_6, 'Face_6' )
+geompy.addToStudyInFather( Cuerpo_1, Face_7, 'Face_7' )
+geompy.addToStudyInFather( Cuerpo_1, Face_8_1, 'Face_8' )
+geompy.addToStudyInFather( Cuerpo_1, Face_9, 'Face_9' )
+geompy.addToStudyInFather( Cuerpo_1, Face_10, 'Face_10' )
+geompy.addToStudyInFather( Cuerpo_1, Face_11, 'Face_11' )
+geompy.addToStudyInFather( Cuerpo_1, Face_12, 'Face_12' )
+geompy.addToStudyInFather( Cuerpo_1, Face_13, 'Face_13' )
+geompy.addToStudyInFather( Cuerpo_1, Face_14, 'Face_14' )
+geompy.addToStudyInFather( Cuerpo_1, Face_15, 'Face_15' )
+geompy.addToStudyInFather( Cuerpo_1, Face_16, 'Face_16' )
+geompy.addToStudyInFather( Cuerpo_1, Face_17, 'Face_17' )
+geompy.addToStudyInFather( Cuerpo_1, Face_18, 'Face_18' )
+geompy.addToStudyInFather( Cuerpo_1, Face_19_1, 'Face_19' )
+geompy.addToStudyInFather( Cuerpo_1, Face_20, 'Face_20' )
+geompy.addToStudyInFather( Cuerpo_1, Face_21, 'Face_21' )
+geompy.addToStudyInFather( Cuerpo_1, Face_22, 'Face_22' )
+geompy.addToStudyInFather( Cuerpo_1, Face_23, 'Face_23' )
+geompy.addToStudyInFather( Cuerpo_1, Face_24, 'Face_24' )
+geompy.addToStudyInFather( Cuerpo_1, Face_25, 'Face_25' )
+geompy.addToStudyInFather( Cuerpo_1, Face_26, 'Face_26' )
+geompy.addToStudyInFather( Cuerpo_1, Face_27, 'Face_27' )
+geompy.addToStudyInFather( Cuerpo_1, Face_28, 'Face_28' )
+geompy.addToStudyInFather( Cuerpo_1, Face_29, 'Face_29' )
+geompy.addToStudyInFather( Cuerpo_1, Face_30_1, 'Face_30' )
+geompy.addToStudyInFather( Cuerpo_1, SymPlane_2, 'SymPlane_2' )
+geompy.addToStudyInFather( Cuerpo_1, Face_32, 'Face_32' )
+geompy.addToStudyInFather( Cuerpo_1, Face_33, 'Face_33' )
+geompy.addToStudyInFather( Cuerpo_1, Face_34, 'Face_34' )
+geompy.addToStudyInFather( Cuerpo_1, Face_35, 'Face_35' )
+geompy.addToStudyInFather( Cuerpo_1, Face_36, 'Face_36' )
+geompy.addToStudyInFather( Cuerpo_1, Face_37, 'Face_37' )
+geompy.addToStudyInFather( Cuerpo_1, Face_38, 'Face_38' )
+geompy.addToStudyInFather( Cuerpo_1, Face_39, 'Face_39' )
+geompy.addToStudyInFather( Cuerpo_1, Face_40, 'Face_40' )
+geompy.addToStudyInFather( Cuerpo_1, Face_41_1, 'Face_41' )
+geompy.addToStudyInFather( Cuerpo_1, Face_42, 'Face_42' )
+geompy.addToStudyInFather( Cuerpo_1, Face_43, 'Face_43' )
+geompy.addToStudyInFather( Cuerpo_1, Face_44, 'Face_44' )
+geompy.addToStudyInFather( Cuerpo_1, Face_45, 'Face_45' )
+geompy.addToStudyInFather( Cuerpo_1, Face_46, 'Face_46' )
+geompy.addToStudyInFather( Cuerpo_1, Face_47, 'Face_47' )
+geompy.addToStudyInFather( Cuerpo_1, Face_48, 'Face_48' )
+geompy.addToStudyInFather( Cuerpo_1, Face_49, 'Face_49' )
+geompy.addToStudyInFather( Cuerpo_1, Face_50, 'Face_50' )
+geompy.addToStudyInFather( Cuerpo_1, Face_51, 'Face_51' )
+geompy.addToStudyInFather( Cuerpo_1, Face_52_1, 'Face_52' )
+geompy.addToStudyInFather( Cuerpo_1, Face_53, 'Face_53' )
+geompy.addToStudyInFather( Cuerpo_1, Face_54, 'Face_54' )
+geompy.addToStudyInFather( Cuerpo_1, Face_55, 'Face_55' )
+geompy.addToStudyInFather( Cuerpo_1, Face_56, 'Face_56' )
+geompy.addToStudyInFather( Cuerpo_1, Face_57, 'Face_57' )
+geompy.addToStudyInFather( Cuerpo_1, Face_58, 'Face_58' )
+geompy.addToStudyInFather( Cuerpo_1, Face_59, 'Face_59' )
+geompy.addToStudyInFather( Cuerpo_1, Face_60, 'Face_60' )
+geompy.addToStudyInFather( Cuerpo_1, Face_61, 'Face_61' )
+geompy.addToStudyInFather( Cuerpo_1, Face_62, 'Face_62' )
+geompy.addToStudyInFather( Cuerpo_1, Face_63_1, 'Face_63' )
+geompy.addToStudyInFather( Cuerpo_1, Face_64, 'Face_64' )
+geompy.addToStudyInFather( Cuerpo_1, Face_65, 'Face_65' )
+geompy.addToStudyInFather( Cuerpo_1, Face_66, 'Face_66' )
+geompy.addToStudyInFather( Cuerpo_1, Face_67, 'Face_67' )
+geompy.addToStudyInFather( Cuerpo_1, Face_68, 'Face_68' )
+geompy.addToStudyInFather( Cuerpo_1, Face_69, 'Face_69' )
+geompy.addToStudyInFather( Cuerpo_1, Face_70, 'Face_70' )
+geompy.addToStudyInFather( Cuerpo_1, Face_71, 'Face_71' )
+geompy.addToStudyInFather( Cuerpo_1, Face_72, 'Face_72' )
+geompy.addToStudyInFather( Cuerpo_1, Face_73, 'Face_73' )
+geompy.addToStudyInFather( Cuerpo_1, Face_74_1, 'Face_74' )
+geompy.addToStudyInFather( Cuerpo_1, Cuerpo_to_Fluid, 'Cuerpo_to_Fluid' )
+geompy.addToStudyInFather( Cuerpo_1, Cuerpo_to_Tapa, 'Cuerpo_to_Tapa' )
+geompy.addToStudyInFather( Cuerpo_1, Cuerpo_to_Allring, 'Cuerpo_to_Allring' )
+geompy.addToStudyInFather( Cuerpo_1, OutsideCuerpo, 'OutsideCuerpo' )
+geompy.addToStudyInFather( Cuerpo_1, SymPlane_Cuerpo, 'SymPlane' )
+
+
+
+
+
+#-----------------------------------------------------------------------#
+#                               FLUIDO                                  #
+#-----------------------------------------------------------------------#
+
+# Se construye utilizando las caras internas del cuerpo y de la tapa. A la salida se le adiciona un canal circular de 30 mm de longitud, de
+# forma sea correcta la utilizacion de una condicion de borde completamente dasarrolada a la salida
+
+# Canal de salida
+Vertex_58 = geompy.MakeVertex(-37, 0, 0)
+Vertex_59 = geompy.MakeVertex(37, 0, -30)
+Circle_5 = geompy.MakeCircle(Vertex_58, None, 8.66985)
+Inlet_Face = geompy.MakeFaceWires([Circle_5], 1)
+Salida = geompy.MakeCylinder(Vertex_59, OZ, 8.66985, 30)
+
+# Corte del canal por la mitad y explosion en caras
+InletMitad = geompy.MakeCut(Inlet_Face, Extrusion_2)
+SalidaMitad = geompy.MakeCut(Salida, Extrusion_2)
+[Face_81,Outlet,Face_91,Face_92] = geompy.ExtractShapes(SalidaMitad, geompy.ShapeType["FACE"], True)
+
+# Fusion de las caras que conforman el fluido
+Fuse_11 = geompy.MakeFuse(Cuerpo_to_Fluid, Tapa_to_Fluid)
+Fuse_12 = geompy.MakeFuse(Fuse_11, InletMitad)
+Fuse_14 = geompy.MakeFuse(Fuse_12, Face_92)
+Fuse_15 = geompy.MakeFuse(Fuse_14, Outlet)
+
+# Construccion de la cara de simetria del fluido. Interseccion de la fusion anterior con el plano XZ, explosion en "edges", construccion de la 
+# cara y fusion para armar una "shell" y luego el "solid" correspondiente
+Section_2 = geompy.MakeSection(Fuse_15, Plane_OZX)
+[Edge_29,Edge_30,Edge_31,Edge_32,Edge_33,Edge_34,Edge_35,Edge_36,Edge_37,Edge_38,Edge_39,Edge_40,Edge_41,Edge_42,Edge_43,Edge_44,Edge_45,Edge_46,Edge_47,Edge_48,Edge_49,Edge_50,Edge_51,Edge_52,Edge_53,Edge_54,Edge_55,Edge_56,Edge_57,Edge_58] = geompy.ExtractShapes(Section_2, geompy.ShapeType["EDGE"], True)
+Face_90 = geompy.MakeFaceWires([Edge_29, Edge_30, Edge_31, Edge_32, Edge_33, Edge_34, Edge_35, Edge_36, Edge_37, Edge_38, Edge_39, Edge_40, Edge_41, Edge_42, Edge_43, Edge_44, Edge_45, Edge_46, Edge_47, Edge_48, Edge_49, Edge_50, Edge_51, Edge_52, Edge_53, Edge_54, Edge_55, Edge_56, Edge_57, Edge_58], 1)
+Shell_1 = geompy.MakeShell([Fuse_15, Face_90])
+Fluid = geompy.MakeSolid([Shell_1])
+geompy.addToStudy( Fluid, 'Fluid' )
+
+# Explosion de las caras del fluido y construccion de grupos
+[Face_1_2,Face_2_1,Face_3_2,Face_4_2,Inlet,Face_6_2,Face_7_2,Face_8_2,Face_9_1,Face_10_2,Face_11_2,Face_12_2,Face_13_2,Face_14_2,Face_15_2,Face_16_2,Face_17_2,Face_18_2,Face_19_2,Face_20_2,Face_21_2,Face_22_2,Face_23_2,Face_24_2,Face_25_2,Face_26_2,Face_27_2,Face_28_2,Face_29_2,Face_30_2,Face_31_1,Face_32_2,Face_33_2,Face_34_1,Face_35_1,Face_36_2,Face_37_2,Face_38_2,Face_39_2,Face_40_1,Face_41_2,Face_42_2,SymPlane_3,Face_44_2,Face_45_2,Face_46_2,Face_47_2,Face_48_2,Face_49_2,Face_50_2,Face_51_2,Face_52_2,Face_53_2,Face_54_2,Face_55_2,Face_56_1,Face_57_2,Face_58_2,Face_59_2,Face_60_2,Face_61_2,Face_62_2,Face_63_2,Face_64_2,Face_65_2,Outlet_1,Face_67_2,Face_68_2,CanalSalida,Face_70_2,Face_71_2,Face_72_2,Face_73_2] = geompy.ExtractShapes(Fluid, geompy.ShapeType["FACE"], True)
+
+Fluid_to_Cuerpo = geompy.CreateGroup(Fluid, geompy.ShapeType["FACE"])
+geompy.UnionIDs(Fluid_to_Cuerpo, [48, 3, 71, 17, 470, 24, 35, 87, 80, 73, 156, 169, 303, 350, 345, 323, 406, 413, 444, 451, 421, 403, 396])
+
+Fluid_to_Tapa = geompy.CreateGroup(Fluid, geompy.ShapeType["FACE"])
+geompy.UnionIDs(Fluid_to_Tapa, [53, 94, 133, 101, 117, 147, 128, 195, 198, 185, 138, 106, 188, 381, 442, 273, 251, 201, 215, 220, 377, 433, 439, 254, 428, 276, 283, 240, 176, 431, 301, 374, 436, 233, 357, 291, 333, 372, 286, 419, 336, 364, 330, 416, 208, 383])
+
+CanalSalida_1 = geompy.CreateGroup(Fluid, geompy.ShapeType["FACE"])
+geompy.UnionIDs(CanalSalida_1, [460])
+
+Inlet_1 = geompy.CreateGroup(Fluid, geompy.ShapeType["FACE"])
+geompy.UnionIDs(Inlet_1, [479])
+
+Outlet_2 = geompy.CreateGroup(Fluid, geompy.ShapeType["FACE"])
+geompy.UnionIDs(Outlet_2, [467])
+
+SymPlane_Fluid = geompy.CreateGroup(Fluid, geompy.ShapeType["FACE"])
+geompy.UnionIDs(SymPlane_Fluid, [482])
+
+geompy.addToStudyInFather( Fluid, Face_1_2, 'Face_1' )
+geompy.addToStudyInFather( Fluid, Face_2_1, 'Face_2' )
+geompy.addToStudyInFather( Fluid, Face_3_2, 'Face_3' )
+geompy.addToStudyInFather( Fluid, Face_4_2, 'Face_4' )
+geompy.addToStudyInFather( Fluid, Inlet, 'Inlet' )
+geompy.addToStudyInFather( Fluid, Face_6_2, 'Face_6' )
+geompy.addToStudyInFather( Fluid, Face_7_2, 'Face_7' )
+geompy.addToStudyInFather( Fluid, Face_8_2, 'Face_8' )
+geompy.addToStudyInFather( Fluid, Face_9_1, 'Face_9' )
+geompy.addToStudyInFather( Fluid, Face_10_2, 'Face_10' )
+geompy.addToStudyInFather( Fluid, Face_11_2, 'Face_11' )
+geompy.addToStudyInFather( Fluid, Face_12_2, 'Face_12' )
+geompy.addToStudyInFather( Fluid, Face_13_2, 'Face_13' )
+geompy.addToStudyInFather( Fluid, Face_14_2, 'Face_14' )
+geompy.addToStudyInFather( Fluid, Face_15_2, 'Face_15' )
+geompy.addToStudyInFather( Fluid, Face_16_2, 'Face_16' )
+geompy.addToStudyInFather( Fluid, Face_17_2, 'Face_17' )
+geompy.addToStudyInFather( Fluid, Face_18_2, 'Face_18' )
+geompy.addToStudyInFather( Fluid, Face_19_2, 'Face_19' )
+geompy.addToStudyInFather( Fluid, Face_20_2, 'Face_20' )
+geompy.addToStudyInFather( Fluid, Face_21_2, 'Face_21' )
+geompy.addToStudyInFather( Fluid, Face_22_2, 'Face_22' )
+geompy.addToStudyInFather( Fluid, Face_23_2, 'Face_23' )
+geompy.addToStudyInFather( Fluid, Face_24_2, 'Face_24' )
+geompy.addToStudyInFather( Fluid, Face_25_2, 'Face_25' )
+geompy.addToStudyInFather( Fluid, Face_26_2, 'Face_26' )
+geompy.addToStudyInFather( Fluid, Face_27_2, 'Face_27' )
+geompy.addToStudyInFather( Fluid, Face_28_2, 'Face_28' )
+geompy.addToStudyInFather( Fluid, Face_29_2, 'Face_29' )
+geompy.addToStudyInFather( Fluid, Face_30_2, 'Face_30' )
+geompy.addToStudyInFather( Fluid, Face_31_1, 'Face_31' )
+geompy.addToStudyInFather( Fluid, Face_32_2, 'Face_32' )
+geompy.addToStudyInFather( Fluid, Face_33_2, 'Face_33' )
+geompy.addToStudyInFather( Fluid, Face_34_1, 'Face_34' )
+geompy.addToStudyInFather( Fluid, Face_35_1, 'Face_35' )
+geompy.addToStudyInFather( Fluid, Face_36_2, 'Face_36' )
+geompy.addToStudyInFather( Fluid, Face_37_2, 'Face_37' )
+geompy.addToStudyInFather( Fluid, Face_38_2, 'Face_38' )
+geompy.addToStudyInFather( Fluid, Face_39_2, 'Face_39' )
+geompy.addToStudyInFather( Fluid, Face_40_1, 'Face_40' )
+geompy.addToStudyInFather( Fluid, Face_41_2, 'Face_41' )
+geompy.addToStudyInFather( Fluid, Face_42_2, 'Face_42' )
+geompy.addToStudyInFather( Fluid, SymPlane_3, 'SymPlane' )
+geompy.addToStudyInFather( Fluid, Face_44_2, 'Face_44' )
+geompy.addToStudyInFather( Fluid, Face_45_2, 'Face_45' )
+geompy.addToStudyInFather( Fluid, Face_46_2, 'Face_46' )
+geompy.addToStudyInFather( Fluid, Face_47_2, 'Face_47' )
+geompy.addToStudyInFather( Fluid, Face_48_2, 'Face_48' )
+geompy.addToStudyInFather( Fluid, Face_49_2, 'Face_49' )
+geompy.addToStudyInFather( Fluid, Face_50_2, 'Face_50' )
+geompy.addToStudyInFather( Fluid, Face_51_2, 'Face_51' )
+geompy.addToStudyInFather( Fluid, Face_52_2, 'Face_52' )
+geompy.addToStudyInFather( Fluid, Face_53_2, 'Face_53' )
+geompy.addToStudyInFather( Fluid, Face_54_2, 'Face_54' )
+geompy.addToStudyInFather( Fluid, Face_55_2, 'Face_55' )
+geompy.addToStudyInFather( Fluid, Face_56_1, 'Face_56' )
+geompy.addToStudyInFather( Fluid, Face_57_2, 'Face_57' )
+geompy.addToStudyInFather( Fluid, Face_58_2, 'Face_58' )
+geompy.addToStudyInFather( Fluid, Face_59_2, 'Face_59' )
+geompy.addToStudyInFather( Fluid, Face_60_2, 'Face_60' )
+geompy.addToStudyInFather( Fluid, Face_61_2, 'Face_61' )
+geompy.addToStudyInFather( Fluid, Face_62_2, 'Face_62' )
+geompy.addToStudyInFather( Fluid, Face_63_2, 'Face_63' )
+geompy.addToStudyInFather( Fluid, Face_64_2, 'Face_64' )
+geompy.addToStudyInFather( Fluid, Face_65_2, 'Face_65' )
+geompy.addToStudyInFather( Fluid, Outlet_1, 'Outlet' )
+geompy.addToStudyInFather( Fluid, Face_67_2, 'Face_67' )
+geompy.addToStudyInFather( Fluid, Face_68_2, 'Face_68' )
+geompy.addToStudyInFather( Fluid, CanalSalida, 'CanalSalida' )
+geompy.addToStudyInFather( Fluid, Face_70_2, 'Face_70' )
+geompy.addToStudyInFather( Fluid, Face_71_2, 'Face_71' )
+geompy.addToStudyInFather( Fluid, Face_72_2, 'Face_72' )
+geompy.addToStudyInFather( Fluid, Face_73_2, 'Face_73' )
+geompy.addToStudyInFather( Fluid, Fluid_to_Cuerpo, 'Fluid_to_Cuerpo' )
+geompy.addToStudyInFather( Fluid, Fluid_to_Tapa, 'Fluid_to_Tapa' )
+geompy.addToStudyInFather( Fluid, CanalSalida_1, 'CanalSalida' )
+geompy.addToStudyInFather( Fluid, Inlet_1, 'Inlet' )
+geompy.addToStudyInFather( Fluid, Outlet_2, 'Outlet' )
+geompy.addToStudyInFather( Fluid, SymPlane_Fluid, 'SymPlane' )
+
+
+
+
+
+
+#-----------------------------------------------------------------------#
+#                              ALLRING                                  #
+#-----------------------------------------------------------------------#
+
+Allring_Face_1 = geompy.MakeFuse(Tapa_to_Allring, Cuerpo_to_Allring)
+Section_3 = geompy.MakeSection(Allring_Face_1, Plane_OZX)
+[Edge_83,Edge_84,Edge_85,Edge_86,Edge_87,Edge_88,Edge_89,Edge_90] = geompy.ExtractShapes(Section_3, geompy.ShapeType["EDGE"], True)
+Face_103 = geompy.MakeFaceWires([Edge_83, Edge_84, Edge_85, Edge_86], 1)
+Face_104 = geompy.MakeFaceWires([Edge_87, Edge_88, Edge_89, Edge_90], 1)
+Fuse_16 = geompy.MakeFuse(Allring_Face_1, Face_103)
+Allring_Face = geompy.MakeFuse(Fuse_16, Face_104)
+Allring = geompy.MakeSolid([Allring_Face])
+[SymPlane1_1,Face_106,Face_107,Face_108,Face_109,Face_110,Face_111,Face_112,Face_113,Face_114,Face_115,Face_116,Face_117,Face_118,Face_119,Face_120,Face_121,SymPlane2] = geompy.ExtractShapes(Allring, geompy.ShapeType["FACE"], True)
+SymPlane_7 = geompy.CreateGroup(Allring, geompy.ShapeType["FACE"])
+geompy.UnionIDs(SymPlane_7, [109, 90])
+
+
+
+
+
+
+
+
+
+
+#-----------------------------------------------------------------------------------------------------#
+#                                      FIN DE LA GEOMETRIA                                            #
+#                                   CONSTRUCCION DE LAS MALLAS                                        #
+#-----------------------------------------------------------------------------------------------------#
+
+# Se arma una malla independiente para cada region, de forma que puedan aplicarse "viscous layers" en caras que separen regiones
+# Una vez calculadas las mallas se unen en un unico "compound" y se exportan en formato UNV
+
+import smesh, SMESH, SALOMEDS
+
+smesh.SetCurrentStudy(theStudy)
+import StdMeshers
+import NETGENPlugin
+
+def PrintMeshInfo(theMesh):
+    aMesh = theMesh.GetMesh()
+    print "Information about mesh:"
+    print "Number of nodes       : ", aMesh.NbNodes()
+    print "Number of edges       : ", aMesh.NbEdges()
+    print "Number of faces       : ", aMesh.NbFaces()
+    print "Number of volumes     : ", aMesh.NbVolumes()
+    print "Number of pyramids    : ", aMesh.NbPyramids()
+    print ""
+    pass
+
+
+##-----------------------------------------------------------------------#
+##                              BLANCO                                   #
+##-----------------------------------------------------------------------#
+
+# Creacion de la malla
+Mesh_Blanco    = smesh.Mesh(Blanco_1)
+
+# Creacion de la hipotesis de calculo 1D
+Regular_1D     = Mesh_Blanco.Segment()
+Blanco_1D      = Regular_1D.LocalLength("blanco_elem",[],1e-07)
+
+# Creacion de la hipotesis de calculo 2D
+NETGEN_2D_ONLY = Mesh_Blanco.Triangle(algo=smesh.NETGEN_2D)
+Blanco_2D      = NETGEN_2D_ONLY.Parameters()
+Blanco_2D.SetMaxSize( "blanco_elem" )
+Blanco_2D.SetSecondOrder( 151 )
+Blanco_2D.SetOptimize( 1 )
+Blanco_2D.SetFineness( 2 )
+Blanco_2D.SetMinSize( "blanco_elem" )
+Blanco_2D.SetQuadAllowed( 0 )
+Blanco_2D.SetSecondOrder( 0 )
+
+# Creacion de la hipotesis de calculo 3D
+NETGEN_3D = Mesh_Blanco.Tetrahedron()
+Blanco_3D = NETGEN_3D.Parameters()
+Blanco_3D.SetMaxSize( "blanco_elem" )
+Blanco_3D.SetSecondOrder( 151 )
+Blanco_3D.SetOptimize( 1 )
+Blanco_3D.SetFineness( 2 )
+Blanco_3D.SetMinSize( "blanco_elem" )
+Blanco_3D.SetSecondOrder( 0 )
+
+# Creacion de la hipotesis de "Viscous Layers"
+Layers_Blanco = NETGEN_3D.ViscousLayers(0.045,5,1,[ 28, 3, 48, 61 ])
+
+# Calculo de la malla
+isDone = Mesh_Blanco.Compute()
+if isDone == 0:
+    print "Problemas al calcular la malla Mesh_Blanco"
+else:
+    print "Mesh_Blanco calculada correctamente"
+    PrintMeshInfo(Mesh_Blanco)
+    pass
+
+# Creacion de grupos a partir de la geometria
+BlancoTop_1         = Mesh_Blanco.GroupOnGeom(BlancoTop,'BlancoTop',SMESH.FACE)
+BlancoSide_1        = Mesh_Blanco.GroupOnGeom(BlancoSide,'BlancoSide',SMESH.FACE)
+SymPlane_Blanco_GFG = Mesh_Blanco.GroupOnGeom(SymPlane_Blanco,'SymPlane',SMESH.FACE) 
+Blanco_to_Tapa_GOG  = Mesh_Blanco.GroupOnGeom(Blanco_to_Tapa,'Blanco_to_Tapa',SMESH.FACE) 
+
+# Set object names
+smesh.SetName(Mesh_Blanco.GetMesh(), 'Mesh_Blanco')
+smesh.SetName(Regular_1D.GetAlgorithm(), 'Regular_1D')
+smesh.SetName(Blanco_1D, 'Blanco 1D')
+smesh.SetName(NETGEN_2D_ONLY.GetAlgorithm(), 'NETGEN_2D_ONLY')
+smesh.SetName(Blanco_2D, 'Blanco 2D')
+smesh.SetName(NETGEN_3D.GetAlgorithm(), 'NETGEN_3D')
+smesh.SetName(Blanco_3D, 'Blanco 3D')
+smesh.SetName(Layers_Blanco, 'Layers_Blanco')
+smesh.SetName(BlancoTop_1, 'BlancoTop')
+smesh.SetName(BlancoSide_1, 'BlancoSide')
+smesh.SetName(SymPlane_Blanco_GFG, 'SymPlane')
+smesh.SetName(Blanco_to_Tapa_GOG, 'Blanco_to_Tapa')
+
+#Mesh_Blanco.ExportUNV('Mesh_Blanco_A.unv')
+
+
+
+
+
+#-----------------------------------------------------------------------#
+#                               TAPA                                    #
+#-----------------------------------------------------------------------#
+
+# Creacion de la malla
+Mesh_Tapa = smesh.Mesh(Tapa_1)
+
+# Creacion de la hipotesis de calculo 1D
+Regular_1D_1 = Mesh_Tapa.Segment()
+Tapa_1D = Regular_1D_1.LocalLength("solid_elem",[],1e-07)
+
+# Creacion de la hipotesis de calculo 2D
+NETGEN_2D_ONLY_1 = Mesh_Tapa.Triangle(algo=smesh.NETGEN_2D)
+Tapa_2D = NETGEN_2D_ONLY_1.Parameters()
+Tapa_2D.SetMaxSize( "solid_elem" )
+Tapa_2D.SetSecondOrder( 248 )
+Tapa_2D.SetOptimize( 1 )
+Tapa_2D.SetFineness( 2 )
+Tapa_2D.SetMinSize( "solid_elem" )
+Tapa_2D.SetQuadAllowed( 0 )
+Tapa_2D.SetSecondOrder( 0 )
+
+# Creacion de la hipotesis de calculo 3D
+NETGEN_3D_1 = Mesh_Tapa.Tetrahedron()
+Tapa_3D = NETGEN_3D_1.Parameters()
+Tapa_3D.SetMaxSize( "solid_elem" )
+Tapa_3D.SetSecondOrder( 248 )
+Tapa_3D.SetOptimize( 1 )
+Tapa_3D.SetFineness( 2 )
+Tapa_3D.SetMinSize( "solid_elem" )
+Tapa_3D.SetSecondOrder( 0 )
+
+# Creacion de la "submesh" Tapa_to_Fluid
+Regular_1D_2 = Mesh_Tapa.Segment(geom=Tapa_to_Fluid)
+TapaToFluid_1D = Regular_1D_2.LocalLength("fluid2tapa_elem",[],1e-07)
+NETGEN_2D_ONLY_2 = Mesh_Tapa.Triangle(algo=smesh.NETGEN_2D,geom=Tapa_to_Fluid)
+TapaToFluid_2D = NETGEN_2D_ONLY_2.Parameters()
+TapaToFluid_2D.SetMaxSize( "fluid2tapa_elem" )
+TapaToFluid_2D.SetSecondOrder( 248 )
+TapaToFluid_2D.SetOptimize( 1 )
+TapaToFluid_2D.SetFineness( 2 )
+TapaToFluid_2D.SetMinSize( "fluid2tapa_elem" )
+TapaToFluid_2D.SetQuadAllowed( 0 )
+TapaToFluid_2D.SetSecondOrder( 0 )
+
+# Creacion de la "submesh" Tapa_to_Blanco
+Regular_1D_3 = Mesh_Tapa.Segment(geom=Tapa_to_Blanco)
+TapaToBlanco_1D = Regular_1D_3.LocalLength("blanco_elem",[],1e-07)
+NETGEN_2D_ONLY_3 = Mesh_Tapa.Triangle(algo=smesh.NETGEN_2D,geom=Tapa_to_Blanco)
+TapaToBlanco_2D = NETGEN_2D_ONLY_3.Parameters()
+TapaToBlanco_2D.SetMaxSize( "blanco_elem" )
+TapaToBlanco_2D.SetSecondOrder( 248 )
+TapaToBlanco_2D.SetOptimize( 1 )
+TapaToBlanco_2D.SetFineness( 2 )
+TapaToBlanco_2D.SetMinSize( "blanco_elem" )
+TapaToBlanco_2D.SetQuadAllowed( 0 )
+TapaToBlanco_2D.SetSecondOrder( 0 )
+
+# Creacion de la "submesh" Tapa_to_Cuerpo
+Regular_1D_ttc = Mesh_Tapa.Segment(geom=Tapa_to_Cuerpo)
+Automatic_Length_1 = Regular_1D_ttc.AutomaticLength(0)
+NETGEN_2D_ONLY_ttc = Mesh_Tapa.Triangle(algo=smesh.NETGEN_2D,geom=Tapa_to_Cuerpo)
+
+# Creacion de la "submesh" SymPlane
+Regular_1D_SymTapa     = Mesh_Tapa.Segment(geom=SymPlane_Tapa)
+Automatic_Length_st    = Regular_1D_SymTapa.AutomaticLength(0)
+NETGEN_2D_ONLY_SymTapa = Mesh_Tapa.Triangle(algo=smesh.NETGEN_2D,geom=SymPlane_Tapa)
+
+# Creacion de la hipotesis de "Viscous Layers" para la zona de deposicion de energia
+Zona_Fuente = NETGEN_3D_1.ViscousLayers(0.036,10,1,[ 20, 95, 138, 150, 145, 159, 182, 291, 268, 280, 296, 275, 260, 307, 430, 460, 323, 440, 463, 489, 312, 328, 418, 435, 453, 479, 122, 482, 504, 246, 58, 187, 337, 443, 544, 456, 546, 466, 548, 485, 550, 494, 542, 425, 265, 249, 125, 34, 3, 243, 531, 523, 119, 539, 534, 507, 372, 356, 515, 537, 526, 512, 520, 529, 367, 383, 415, 404, 388, 351, 344, 399, 192, 197, 222, 229, 234, 27, 112 ])
+
+# Construccion de las submeshes
+SubMesh_TapaToFluid  = Regular_1D_2.GetSubMesh()
+SubMesh_TapaToBlanco = Regular_1D_3.GetSubMesh()
+SubMesh_TapaToCuerpo = Regular_1D_ttc.GetSubMesh()
+SubMesh_SymPlaneTapa = Regular_1D_SymTapa.GetSubMesh()
+
+# Calculo de la malla
+isDone = Mesh_Tapa.Compute()
+if isDone == 0:
+    print "Problemas al calcular la malla Mesh_Tapa"
+else:
+    print "Mesh_Tapa calculada correctamente"
+    PrintMeshInfo(Mesh_Tapa)
+    pass
+
+# Creacion de grupos a partir de la geometria
+TapaToAllring_Group = Mesh_Tapa.GroupOnGeom(Tapa_to_Allring,'Tapa_to_Allring',SMESH.FACE)
+OutsideTapa_Group   = Mesh_Tapa.GroupOnGeom(OutsideTapa,'OutsideTapa',SMESH.FACE)
+SymPlane_GroupTapa  = Mesh_Tapa.GroupOnGeom(SymPlane_Tapa,'SymPlane',SMESH.FACE)
+Tapa_to_Blanco_GOG  = Mesh_Tapa.GroupOnGeom(Tapa_to_Blanco,'Tapa_to_Blanco',SMESH.FACE)
+Tapa_to_Cuerpo_GOG  = Mesh_Tapa.GroupOnGeom(Tapa_to_Cuerpo,'Tapa_to_Cuerpo',SMESH.FACE)
+Tapa_to_Fluid_GOG   = Mesh_Tapa.GroupOnGeom(Tapa_to_Fluid,'Tapa_to_Fluid',SMESH.FACE)
+
+# Set object names
+smesh.SetName(Mesh_Tapa.GetMesh(), 'Mesh_Tapa')
+smesh.SetName(Tapa_1D, 'Tapa 1D')
+smesh.SetName(Tapa_2D, 'Tapa 2D')
+smesh.SetName(Tapa_3D, 'Tapa 3D')
+smesh.SetName(TapaToFluid_1D, 'TapaToFluid 1D')
+smesh.SetName(TapaToFluid_2D, 'TapaToFluid 2D')
+smesh.SetName(TapaToBlanco_1D, 'TapaToBlanco 1D')
+smesh.SetName(TapaToBlanco_2D, 'TapaToBlanco 2D')
+smesh.SetName(SubMesh_TapaToFluid, 'SubMesh_TapaToFluid')
+smesh.SetName(SubMesh_TapaToBlanco, 'SubMesh_TapaToBlanco')
+smesh.SetName(SubMesh_TapaToCuerpo, 'SubMesh_TapaToCuerpo')
+smesh.SetName(TapaToAllring_Group, 'Tapa_to_Allring')
+smesh.SetName(OutsideTapa_Group, 'OutsideTapa')
+smesh.SetName(SymPlane_GroupTapa, 'SymPlane')
+smesh.SetName(Tapa_to_Fluid_GOG, 'Tapa_to_Fluid')
+smesh.SetName(Tapa_to_Cuerpo_GOG, 'Tapa_to_Cuerpo')
+smesh.SetName(Tapa_to_Blanco_GOG, 'Tapa_to_Blanco')
+smesh.SetName(Zona_Fuente, 'Zona_Fuente')
+smesh.SetName(SubMesh_SymPlaneTapa, 'SubMesh_SymPlaneTapa')
+
+#Mesh_Tapa.ExportUNV('Mesh_Tapa_A.unv')
+
+
+
+
+
+
+
+#-----------------------------------------------------------------------#
+#                               CUERPO                                  #
+#-----------------------------------------------------------------------#
+
+# Creacion de la malla
+Mesh_Cuerpo = smesh.Mesh(Cuerpo_1)
+
+# Creacion de la hipotesis de calculo 1D
+Regular_1D_4 = Mesh_Cuerpo.Segment()
+Cuerpo_1D = Regular_1D_4.LocalLength("solid_elem",[],1e-07)
+
+# Creacion de la hipotesis de calculo 2D
+NETGEN_2D_ONLY_4 = Mesh_Cuerpo.Triangle(algo=smesh.NETGEN_2D)
+Cuerpo_2D = NETGEN_2D_ONLY_4.Parameters()
+Cuerpo_2D.SetMaxSize( "solid_elem" )
+Cuerpo_2D.SetSecondOrder( 248 )
+Cuerpo_2D.SetOptimize( 1 )
+Cuerpo_2D.SetFineness( 2 )
+Cuerpo_2D.SetMinSize( "solid_elem" )
+Cuerpo_2D.SetQuadAllowed( 0 )
+Cuerpo_2D.SetSecondOrder( 0 )
+
+# Creacion de la hipotesis de calculo 3D
+NETGEN_3D_2 = Mesh_Cuerpo.Tetrahedron()
+Cuerpo_3D = NETGEN_3D_2.Parameters()
+Cuerpo_3D.SetMaxSize( "solid_elem" )
+Cuerpo_3D.SetSecondOrder( 248 )
+Cuerpo_3D.SetOptimize( 1 )
+Cuerpo_3D.SetFineness( 2 )
+Cuerpo_3D.SetMinSize( "solid_elem" )
+Cuerpo_3D.SetSecondOrder( 0 )
+
+# Creacion de la "submesh" Cuerpo_to_Fluid
+Regular_1D_5 = Mesh_Cuerpo.Segment(geom=Cuerpo_to_Fluid)
+CuerpoToFluid_1D = Regular_1D_5.LocalLength("fluid2cuerpo_elem",[],1e-07)
+NETGEN_2D_ONLY_5 = Mesh_Cuerpo.Triangle(algo=smesh.NETGEN_2D,geom=Cuerpo_to_Fluid)
+CuerpoToFluid_2D = NETGEN_2D_ONLY_5.Parameters()
+CuerpoToFluid_2D.SetMaxSize( "fluid2cuerpo_elem" )
+CuerpoToFluid_2D.SetSecondOrder( 248 )
+CuerpoToFluid_2D.SetOptimize( 1 )
+CuerpoToFluid_2D.SetFineness( 2 )
+CuerpoToFluid_2D.SetMinSize( "fluid2cuerpo_elem" )
+CuerpoToFluid_2D.SetQuadAllowed( 0 )
+CuerpoToFluid_2D.SetSecondOrder( 0 )
+
+# Creacion de la "submesh" Cuerpo_to_Tapa
+Regular_1D_ctt = Mesh_Cuerpo.Segment(geom=Cuerpo_to_Tapa)
+Automatic_Length_2 = Regular_1D_ctt.AutomaticLength(0)
+NETGEN_2D_ONLY_ctt = Mesh_Cuerpo.Triangle(algo=smesh.NETGEN_2D,geom=Cuerpo_to_Tapa)
+
+# Creacion de la "submesh" de faces para que calcule
+Regular_1D_f64 = Mesh_Cuerpo.Segment(geom=Face_64)
+Automatic_Length_f64 = Regular_1D_f64.AutomaticLength(0)
+NETGEN_2D_ONLY_f64 = Mesh_Cuerpo.Triangle(algo=smesh.NETGEN_2D,geom=Face_64)
+Regular_1D_f12 = Mesh_Cuerpo.Segment(geom=Face_12)
+Automatic_Length_f12 = Regular_1D_f12.AutomaticLength(0)
+NETGEN_2D_ONLY_f12 = Mesh_Cuerpo.Triangle(algo=smesh.NETGEN_2D,geom=Face_12)
+
+
+# Creacion de la "submesh" SymPlane
+Regular_1D_SymCuerpo     = Mesh_Cuerpo.Segment(geom=SymPlane_Cuerpo)
+Automatic_Length_sc      = Regular_1D_SymCuerpo.AutomaticLength(0)
+NETGEN_2D_ONLY_SymCuerpo = Mesh_Cuerpo.Triangle(algo=smesh.NETGEN_2D,geom=SymPlane_Cuerpo)
+
+# Construccion de las submeshes
+SubMesh_CuerpoToFluid = Regular_1D_5.GetSubMesh()
+SubMesh_CuerpoToTapa = Regular_1D_ctt.GetSubMesh()
+SubMesh_face12 = Regular_1D_f12.GetSubMesh()
+SubMesh_face64 = Regular_1D_f64.GetSubMesh()
+SubMesh_SymPlaneCuerpo = Regular_1D_SymCuerpo.GetSubMesh()
+
+# Calculo de la malla
+isDone = Mesh_Cuerpo.Compute()
+if isDone == 0:
+    print "Problemas al calcular la malla Mesh_Cuerpo"
+else:
+    print "Mesh_Cuerpo calculada correctamente"
+    PrintMeshInfo(Mesh_Cuerpo)
+    pass
+
+# Creacion de grupos a partir de la geometria
+CuerpoToAllring_Group = Mesh_Cuerpo.GroupOnGeom(Cuerpo_to_Allring,'Cuerpo_to_Allring',SMESH.FACE)
+OutsideCuerpo_Group   = Mesh_Cuerpo.GroupOnGeom(OutsideCuerpo,'OutsideCuerpo',SMESH.FACE)
+SymPlane_GroupCuerpo  = Mesh_Cuerpo.GroupOnGeom(SymPlane_Cuerpo,'SymPlane',SMESH.FACE)
+Cuerpo_to_Tapa_GOG    = Mesh_Cuerpo.GroupOnGeom(Cuerpo_to_Tapa,'Cuerpo_to_Tapa',SMESH.FACE)
+Cuerpo_to_Fluid_GOG   = Mesh_Cuerpo.GroupOnGeom(Cuerpo_to_Fluid,'Cuerpo_to_Fluid',SMESH.FACE)
+
+# Set object names
+smesh.SetName(Mesh_Cuerpo.GetMesh(), 'Mesh_Cuerpo')
+smesh.SetName(Cuerpo_1D, 'Cuerpo 1D')
+smesh.SetName(Cuerpo_2D, 'Cuerpo 2D')
+smesh.SetName(Cuerpo_3D, 'Cuerpo 3D')
+smesh.SetName(CuerpoToFluid_1D, 'CuerpoToFluid 1D')
+smesh.SetName(CuerpoToFluid_2D, 'CuerpoToFluid 2D')
+smesh.SetName(SubMesh_CuerpoToFluid, 'SubMesh_CuerpoToFluid')
+smesh.SetName(SubMesh_CuerpoToTapa, 'SubMesh_CuerpoToTapa')
+smesh.SetName(CuerpoToAllring_Group, 'Cuerpo_to_Allring')
+smesh.SetName(OutsideCuerpo_Group, 'OutsideCuerpo')
+smesh.SetName(SymPlane_GroupCuerpo, 'SymPlane')
+smesh.SetName(Cuerpo_to_Tapa_GOG, 'Cuerpo_to_Tapa')
+smesh.SetName(Cuerpo_to_Fluid_GOG, 'Cuerpo_to_Fluid')
+smesh.SetName(SubMesh_SymPlaneCuerpo, 'SubMesh_SymPlaneCuerpo')
+
+#Mesh_Cuerpo.ExportUNV('Mesh_Cuerpo_A.unv')
+
+
+
+
+
+
+
+
+#-----------------------------------------------------------------------#
+#                               FLUID                                   #
+#-----------------------------------------------------------------------#
+
+# Creacion de la malla
+Mesh_Fluid = smesh.Mesh(Fluid)
+
+# Creacion de la hipotesis de calculo 1D
+Regular_1D_6 = Mesh_Fluid.Segment()
+Fluid_1D = Regular_1D_6.LocalLength("fluid2cuerpo_elem",[],1e-07)
+
+# Creacion de la hipotesis de calculo 2D
+NETGEN_2D_ONLY_6 = Mesh_Fluid.Triangle(algo=smesh.NETGEN_2D)
+Fluid_2D = NETGEN_2D_ONLY_6.Parameters()
+Fluid_2D.SetMaxSize( "fluid2cuerpo_elem" )
+Fluid_2D.SetSecondOrder( 167 )
+Fluid_2D.SetOptimize( 1 )
+Fluid_2D.SetFineness( 2 )
+Fluid_2D.SetMinSize( "fluid2cuerpo_elem" )
+Fluid_2D.SetQuadAllowed( 0 )
+Fluid_2D.SetSecondOrder( 0 )
+
+# Creacion de la hipotesis de calculo 3D
+NETGEN_3D_3 = Mesh_Fluid.Tetrahedron()
+Fluid_3D = NETGEN_3D_3.Parameters()
+Fluid_3D.SetMaxSize( "fluid_maxsize" )
+Fluid_3D.SetSecondOrder( 167 )
+Fluid_3D.SetOptimize( 1 )
+Fluid_3D.SetFineness( 2 )
+Fluid_3D.SetMinSize( "fluid2cuerpo_elem" )
+Fluid_3D.SetSecondOrder( 0 )
+
+# Creacion de la "submesh" Fluid_to_Cuerpo
+Regular_1D_7 = Mesh_Fluid.Segment(geom=Fluid_to_Cuerpo)
+FluidToCuerpo_1D = Regular_1D_7.LocalLength("fluid2cuerpo_elem",[],1e-07)
+NETGEN_2D_ONLY_7 = Mesh_Fluid.Triangle(algo=smesh.NETGEN_2D,geom=Fluid_to_Cuerpo)
+FluidToCuerpo_2D = NETGEN_2D_ONLY_7.Parameters()
+FluidToCuerpo_2D.SetMaxSize( "fluid2cuerpo_elem" )
+FluidToCuerpo_2D.SetSecondOrder( 167 )
+FluidToCuerpo_2D.SetOptimize( 1 )
+FluidToCuerpo_2D.SetFineness( 2 )
+FluidToCuerpo_2D.SetMinSize( "fluid2cuerpo_elem" )
+FluidToCuerpo_2D.SetQuadAllowed( 0 )
+FluidToCuerpo_2D.SetSecondOrder( 0 )
+
+# Creacion de la "submesh" Fluid_to_Tapa
+Regular_1D_8 = Mesh_Fluid.Segment(geom=Fluid_to_Tapa)
+FluidToTapa_1D = Regular_1D_8.LocalLength("fluid2tapa_elem",[],1e-07)
+NETGEN_2D_ONLY_8 = Mesh_Fluid.Triangle(algo=smesh.NETGEN_2D,geom=Fluid_to_Tapa)
+FluidToTapa_2D = NETGEN_2D_ONLY_8.Parameters()
+FluidToTapa_2D.SetMaxSize( "fluid2tapa_elem" )
+FluidToTapa_2D.SetSecondOrder( 167 )
+FluidToTapa_2D.SetOptimize( 1 )
+FluidToTapa_2D.SetFineness( 2 )
+FluidToTapa_2D.SetMinSize( "fluid2tapa_elem" )
+FluidToTapa_2D.SetQuadAllowed( 0 )
+FluidToTapa_2D.SetSecondOrder( 0 )
+
+
+# Creacion de la "submesh" de faces para que calcule
+Regular_1D_f72 = Mesh_Fluid.Segment(geom=Face_72_2)
+Automatic_Length_f72 = Regular_1D_f72.AutomaticLength(0)
+NETGEN_2D_ONLY_f72 = Mesh_Fluid.Triangle(algo=smesh.NETGEN_2D,geom=Face_72_2)
+Regular_1D_f4 = Mesh_Fluid.Segment(geom=Face_4_2)
+Automatic_Length_f4 = Regular_1D_f4.AutomaticLength(0)
+NETGEN_2D_ONLY_f4 = Mesh_Fluid.Triangle(algo=smesh.NETGEN_2D,geom=Face_4_2)
+
+# Creacion de la "submesh" SymPlane
+Regular_1D_SymFluid     = Mesh_Fluid.Segment(geom=SymPlane_Fluid)
+Automatic_Length_sf     = Regular_1D_SymFluid.LocalLength("fluid2cuerpo_elem",[],1e-07)
+#Automatic_Length_sf     = Regular_1D_SymFluid.AutomaticLength(0)
+#NETGEN_2D_ONLY_SymFluid = Mesh_Fluid.Triangle(algo=smesh.NETGEN_2D,geom=SymPlane_Fluid)
+NETGEN_2D_ONLY_SymFluid = Mesh_Fluid.Triangle(algo=smesh.NETGEN_2D,geom=SymPlane_Fluid)
+SymFluid_2D = NETGEN_2D_ONLY_SymFluid.Parameters()
+SymFluid_2D.SetMaxSize( "fluid_maxsize" )
+SymFluid_2D.SetSecondOrder( 167 )
+SymFluid_2D.SetOptimize( 1 )
+SymFluid_2D.SetFineness( 3 )
+SymFluid_2D.SetMinSize( "fluid2cuerpo_elem" )
+SymFluid_2D.SetQuadAllowed( 0 )
+SymFluid_2D.SetSecondOrder( 0 )
+
+
+# Construccion de las submeshes
+SubMesh_FluidToCuerpo = Regular_1D_7.GetSubMesh()
+SubMesh_FluidToTapa = Regular_1D_8.GetSubMesh()
+SubMesh_face72 = Regular_1D_f72.GetSubMesh()
+SubMesh_face4 = Regular_1D_f4.GetSubMesh()
+SubMesh_SymPlaneFluid = Regular_1D_SymFluid.GetSubMesh()
+
+# Calculo de la malla
+isDone = Mesh_Fluid.Compute()
+if isDone == 0:
+    print "Problemas al calcular la malla Mesh_Fluid"
+else:
+    print "Mesh_Fluid calculada correctamente"
+    PrintMeshInfo(Mesh_Fluid)
+    pass
+
+# Creacion de grupos a partir de la geometria
+Inlet_Group         = Mesh_Fluid.GroupOnGeom(Inlet_1,'Inlet',SMESH.FACE)
+Outlet_Group        = Mesh_Fluid.GroupOnGeom(Outlet_2,'Outlet',SMESH.FACE)
+SymPlane_GroupFluid = Mesh_Fluid.GroupOnGeom(SymPlane_Fluid,'SymPlane',SMESH.FACE)
+CanalSalida_Group   = Mesh_Fluid.GroupOnGeom(CanalSalida_1,'CanalSalida',SMESH.FACE)
+Fluid_to_Cuerpo_GOG = Mesh_Fluid.GroupOnGeom(Fluid_to_Cuerpo,'Fluid_to_Cuerpo',SMESH.FACE)
+Fluid_to_Tapa_GOG   = Mesh_Fluid.GroupOnGeom(Fluid_to_Tapa,'Fluid_to_Tapa',SMESH.FACE)
+
+# Set object names
+smesh.SetName(Mesh_Fluid.GetMesh(), 'Mesh_Fluid')
+smesh.SetName(Fluid_1D, 'Fluid 1D')
+smesh.SetName(Fluid_2D, 'Fluid 2D')
+smesh.SetName(Fluid_3D, 'Fluid 3D')
+smesh.SetName(FluidToCuerpo_1D, 'FluidToCuerpo 1D')
+smesh.SetName(FluidToCuerpo_2D, 'FluidToCuerpo 2D')
+smesh.SetName(FluidToTapa_1D, 'FluidToTapa D')
+smesh.SetName(FluidToTapa_2D, 'FluidToTapa 2D')
+smesh.SetName(SubMesh_FluidToCuerpo, 'SubMesh_FluidToCuerpo')
+smesh.SetName(SubMesh_FluidToTapa, 'SubMesh_FluidToTapa')
+smesh.SetName(Inlet_Group, 'Inlet')
+smesh.SetName(Outlet_Group, 'Outlet')
+smesh.SetName(SymPlane_GroupFluid, 'SymPlane')
+smesh.SetName(CanalSalida_Group, 'CanalSalida')
+smesh.SetName(Fluid_to_Tapa_GOG, 'Fluid_to_Tapa')
+smesh.SetName(Fluid_to_Cuerpo_GOG, 'Fluid_to_Cuerpo')
+smesh.SetName(SubMesh_SymPlaneFluid, 'SubMesh_SymPlaneFluid')
+
+#Mesh_Fluid.ExportUNV('Mesh_Fluid_A.unv')
+
+
+
+
+#-----------------------------------------------------------------------#
+#                             MALLA FINAL                               #
+#-----------------------------------------------------------------------#
+
+# Creacion de la malla
+#Compound_Mesh_1 = smesh.Concatenate([Mesh_Blanco.GetMesh(), Mesh_Tapa.GetMesh(), Mesh_Cuerpo.GetMesh(), Mesh_Fluid.GetMesh()], 1, 1, 1e-05,True)
+Compound_Mesh_1 = smesh.Concatenate([Mesh_Blanco.GetMesh(), Mesh_Tapa.GetMesh(), Mesh_Cuerpo.GetMesh(), Mesh_Fluid.GetMesh()], 1, 0, 1e-05,True)    # no merge sobre nodos coincidentes
+
+print "Malla compuesta creada correctamente"
+PrintMeshInfo(Compound_Mesh_1)
+
+
+# Incorporacion de los grupos
+[ smeshObj_1, smeshObj_2, smeshObj_3, GrMesh_Blanco_Volumes, BlancoTop_2, BlancoSide_2, SymPlane_11, smeshObj_4, smeshObj_5, smeshObj_6, smeshObj_7, GrMesh_Tapa_Volumes, Tapa_to_Allring_2, OutsideTapa_2, smeshObj_8, smeshObj_9, smeshObj_10, smeshObj_11, smeshObj_12, smeshObj_13, GrMesh_Cuerpo_Volumes, Cuerpo_to_Allring_2, OutsideCuerpo_2, smeshObj_14, smeshObj_15, smeshObj_16, smeshObj_17, smeshObj_18, GrMesh_Fluid_Volumes, Inlet_3, Outlet_3, CanalSalida_3, smeshObj_19, smeshObj_20 ] = Compound_Mesh_1.GetGroups()
+
+## Remocion de los grupos que no deben aparecer en el archivo UNV, para que pueda ser convertido correctamente al formato de OpenFOAM
+Compound_Mesh_1.RemoveGroup( smeshObj_1 )
+Compound_Mesh_1.RemoveGroup( smeshObj_2 )
+Compound_Mesh_1.RemoveGroup( smeshObj_3 )
+#Compound_Mesh_1.RemoveGroup( smeshObj_4 )
+Compound_Mesh_1.RemoveGroup( smeshObj_5 )
+Compound_Mesh_1.RemoveGroup( smeshObj_6 )
+Compound_Mesh_1.RemoveGroup( smeshObj_7 )
+#Compound_Mesh_1.RemoveGroup( smeshObj_8 )
+#Compound_Mesh_1.RemoveGroup( smeshObj_9 )
+#Compound_Mesh_1.RemoveGroup( smeshObj_10 )
+Compound_Mesh_1.RemoveGroup( smeshObj_11 )
+Compound_Mesh_1.RemoveGroup( smeshObj_12 )
+Compound_Mesh_1.RemoveGroup( smeshObj_13 )
+#Compound_Mesh_1.RemoveGroup( smeshObj_14 )
+#Compound_Mesh_1.RemoveGroup( smeshObj_15 )
+Compound_Mesh_1.RemoveGroup( smeshObj_16 )
+Compound_Mesh_1.RemoveGroup( smeshObj_17 )
+Compound_Mesh_1.RemoveGroup( smeshObj_18 )
+#Compound_Mesh_1.RemoveGroup( smeshObj_19 )
+#Compound_Mesh_1.RemoveGroup( smeshObj_20 )
+
+## some objects were removed
+aStudyBuilder = theStudy.NewBuilder()
+SO = theStudy.FindObjectIOR(theStudy.ConvertObjectToIOR(smeshObj_1))
+if SO is not None: aStudyBuilder.RemoveObjectWithChildren(SO)
+SO = theStudy.FindObjectIOR(theStudy.ConvertObjectToIOR(smeshObj_2))
+if SO is not None: aStudyBuilder.RemoveObjectWithChildren(SO)
+SO = theStudy.FindObjectIOR(theStudy.ConvertObjectToIOR(smeshObj_3))
+if SO is not None: aStudyBuilder.RemoveObjectWithChildren(SO)
+#SO = theStudy.FindObjectIOR(theStudy.ConvertObjectToIOR(smeshObj_4))
+#if SO is not None: aStudyBuilder.RemoveObjectWithChildren(SO)
+SO = theStudy.FindObjectIOR(theStudy.ConvertObjectToIOR(smeshObj_5))
+if SO is not None: aStudyBuilder.RemoveObjectWithChildren(SO)
+SO = theStudy.FindObjectIOR(theStudy.ConvertObjectToIOR(smeshObj_6))
+if SO is not None: aStudyBuilder.RemoveObjectWithChildren(SO)
+SO = theStudy.FindObjectIOR(theStudy.ConvertObjectToIOR(smeshObj_7))
+if SO is not None: aStudyBuilder.RemoveObjectWithChildren(SO)
+#SO = theStudy.FindObjectIOR(theStudy.ConvertObjectToIOR(smeshObj_8))
+#if SO is not None: aStudyBuilder.RemoveObjectWithChildren(SO)
+#SO = theStudy.FindObjectIOR(theStudy.ConvertObjectToIOR(smeshObj_9))
+#if SO is not None: aStudyBuilder.RemoveObjectWithChildren(SO)
+#SO = theStudy.FindObjectIOR(theStudy.ConvertObjectToIOR(smeshObj_10))
+#if SO is not None: aStudyBuilder.RemoveObjectWithChildren(SO)
+SO = theStudy.FindObjectIOR(theStudy.ConvertObjectToIOR(smeshObj_11))
+if SO is not None: aStudyBuilder.RemoveObjectWithChildren(SO)
+SO = theStudy.FindObjectIOR(theStudy.ConvertObjectToIOR(smeshObj_12))
+if SO is not None: aStudyBuilder.RemoveObjectWithChildren(SO)
+SO = theStudy.FindObjectIOR(theStudy.ConvertObjectToIOR(smeshObj_13))
+if SO is not None: aStudyBuilder.RemoveObjectWithChildren(SO)
+#SO = theStudy.FindObjectIOR(theStudy.ConvertObjectToIOR(smeshObj_14))
+#if SO is not None: aStudyBuilder.RemoveObjectWithChildren(SO)
+#SO = theStudy.FindObjectIOR(theStudy.ConvertObjectToIOR(smeshObj_15))
+if SO is not None: aStudyBuilder.RemoveObjectWithChildren(SO)
+SO = theStudy.FindObjectIOR(theStudy.ConvertObjectToIOR(smeshObj_16))
+if SO is not None: aStudyBuilder.RemoveObjectWithChildren(SO)
+SO = theStudy.FindObjectIOR(theStudy.ConvertObjectToIOR(smeshObj_17))
+if SO is not None: aStudyBuilder.RemoveObjectWithChildren(SO)
+SO = theStudy.FindObjectIOR(theStudy.ConvertObjectToIOR(smeshObj_18))
+if SO is not None: aStudyBuilder.RemoveObjectWithChildren(SO)
+#SO = theStudy.FindObjectIOR(theStudy.ConvertObjectToIOR(smeshObj_19))
+#if SO is not None: aStudyBuilder.RemoveObjectWithChildren(SO)
+#SO = theStudy.FindObjectIOR(theStudy.ConvertObjectToIOR(smeshObj_20))
+#if SO is not None: aStudyBuilder.RemoveObjectWithChildren(SO)
+
+# Reenumerar nodos
+Compound_Mesh_1.RenumberNodes()
+
+# Set volume names
+smesh.SetName(Compound_Mesh_1.GetMesh(), 'Compound_Mesh_1')
+smesh.SetName(GrMesh_Blanco_Volumes, 'Blanco')
+smesh.SetName(GrMesh_Tapa_Volumes, 'Tapa')
+smesh.SetName(GrMesh_Cuerpo_Volumes, 'Cuerpo')
+smesh.SetName(GrMesh_Fluid_Volumes, 'Fluid')
+
+# Set face names
+smesh.SetName(BlancoTop_2, 'BlancoTop')
+smesh.SetName(BlancoSide_2, 'BlancoSide')
+smesh.SetName(SymPlane_11, 'SymPlane')
+smesh.SetName(Tapa_to_Allring_2, 'Tapa_to_Allring')
+smesh.SetName(OutsideTapa_2, 'OutsideTapa')
+smesh.SetName(Cuerpo_to_Allring_2, 'Cuerpo_to_Allring')
+smesh.SetName(OutsideCuerpo_2, 'OutsideCuerpo')
+smesh.SetName(Inlet_3, 'Inlet')
+smesh.SetName(Outlet_3, 'Outlet')
+smesh.SetName(CanalSalida_3, 'CanalSalida')
+
+smesh.SetName(smeshObj_4, 'Blanco_to_Tapa')
+smesh.SetName(smeshObj_8, 'Tapa_to_Blanco')
+smesh.SetName(smeshObj_9, 'Tapa_to_Cuerpo')
+smesh.SetName(smeshObj_10, 'Tapa_to_Fluid')
+smesh.SetName(smeshObj_14, 'Cuerpo_to_Tapa')
+smesh.SetName(smeshObj_15, 'Cuerpo_to_Fluid')
+smesh.SetName(smeshObj_19, 'Fluid_to_Cuerpo')
+smesh.SetName(smeshObj_20, 'Fluid_to_Tapa')
+
+# Exportacion de la malla a formato UNV
+Compound_Mesh_1.ExportUNV('Mesh_H.unv')

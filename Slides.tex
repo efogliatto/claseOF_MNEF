@@ -1,0 +1,50 @@
+% Caracteristicas principales de la presentacion
+\documentclass{beamer}
+\usepackage[spanish]{babel}
+\usepackage[format=hang]{caption}
+%\mode<presentation>
+\usetheme{Warsaw}
+\useoutertheme{infolines}
+
+\captionsetup{width=0.75\textwidth,textfont=scriptsize,labelfont={bf,scriptsize},format=plain,font=it} 
+
+\author[Fogliatto, E.]{Federico Teruel \\ Ezequiel Fogliatto}
+\title[OpenFOAM\textsuperscript{\textregistered} para PDE's]{OpenFOAM\textsuperscript{\textregistered} como herramienta de resoluci\'on de PDE's}
+\subtitle{M\'etodos Num\'ericos en Fluidos 2016}
+\institute[MECOM-IB]{Departamento de Mec\'anica Computacional - Centro At\'omico Bariloche \and Instituto Balseiro}
+
+\AtBeginSection[]
+{
+    \begin{frame}
+        \frametitle{Outline}
+        \tableofcontents[currentsection]
+    \end{frame}
+}
+
+\begin{document}
+
+\renewcommand{\tablename}{Tabla}
+\newcommand{\bs}[1]{\boldsymbol{#1}}
+
+    \begin{frame}
+        \titlepage
+    \end{frame}
+
+    \begin{frame}
+        \frametitle{Outline}
+        \tableofcontents
+    \end{frame}
+    
+
+\input Caracteristicas
+
+\input FVM
+
+\input Uso
+
+\input Cavidad
+        
+
+    
+
+\end{document}
